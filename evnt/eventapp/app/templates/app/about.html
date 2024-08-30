@@ -1,0 +1,26 @@
+{% extends "app/base.html" %}
+{% load static %}
+{% block title %}About{% endblock %}
+
+{% block body_block %}
+<link rel="stylesheet" href="{% static 'about.css' %}">
+<div class="about-container">
+    <p>Made with love by PRIYANSHU</p>
+    <h1>About the App</h1>
+    <p>
+        Welcome to our event management and team coordination platform, designed with both individual hosts and groups in mind. I developed this app to streamline the process of organizing and managing events.
+    </p>
+    <p>
+        Whether you're planning an event, workshop, or any gathering, this app provides a comprehensive solution for seamless event management. Here's what you can do with it:
+    </p>
+    <ul>
+        <li><strong>Host Events:</strong> Easily create events that are visible to everyone. As the host, you have full control over the event and can invite staff members to assist you. Assign varying roles to your team to ensure everything runs smoothly.</li>
+        <li><strong>Team Management:</strong> Manage your team efficiently with our built-in system. The app allows for dynamic team coordination, with features like checking in and out of rooms, creating custom timetables based on team availability, and receiving notifications when someone is needed in a specific room.</li>
+        <li><strong>Dynamic Room Management:</strong> Monitor and manage the real-time flow of people in and out of rooms with our live check-in/check-out system.</li>
+    </ul>
+</div>
+{% endblock %}
+
+{% block footer %}
+{{ block.super }}
+{% endblock %}

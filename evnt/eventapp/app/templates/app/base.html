@@ -1,0 +1,44 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="{% static 'base.css' %}">
+    <title>{% block title %}Event Tracker{% endblock %}</title>
+</head>
+
+<body>
+    <div class="content-wrap">
+        <nav id="nav">
+            <a href="http://localhost:8000/"><img src="{% static 'applogo.webp' %}" alt="App Logo"></a> 
+            <button id="modal-settings" class="icon-button"><i class="fas fa-stream"></i></button>
+        </nav>
+
+        <div id="modal-outer">
+            <div id="modal-inside">
+                <a style="text-decoration: none;" href="#"><button class="modal-btn">Login!</button></a>
+                <a  style="text-decoration: none;" href="{% url 'host' %}"><button class="modal-btn">HOST</button></a>
+                <a  style="text-decoration: none;" href="{% url 'myevent' %}"><button class="modal-btn">My Events</button></a>
+                <a style="text-decoration: none;" href="{% url 'about' %}"><button class="modal-btn">About</button></a>
+            </div>
+        </div>
+
+        {% block body_block %}
+        {% endblock %}
+    </div>
+
+    {% block footer %}
+    <footer class="footer">
+        <p>Have a feedback?</p>
+        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=priyanshumahlawat5@gmail.com&su=Feedback for the Event Management App&body=Hi Priyanshu,%0D%0A%0D%0AHere is my feedback:"
+            target="_blank">Click Here!</a>
+    </footer>
+    {% endblock %}
+    <script src="{% static 'base.js' %}"></script>
+</body>
+
+</html>

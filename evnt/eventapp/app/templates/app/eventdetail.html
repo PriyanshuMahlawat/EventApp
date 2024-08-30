@@ -1,0 +1,24 @@
+{% extends "app/base.html" %}
+{% load static %}
+{% block title %}Event Detail{% endblock %}
+
+{% block body_block %}
+<link rel="stylesheet" href="{% static 'detail.css' %}">
+
+<div class="event-container">
+    <div class="event-thumbnail">
+        <img id="event-thumbnail" src="" alt="Event Thumbnail">
+    </div>
+    <div class="event-details">
+        <h1 id="event-name"></h1>
+        <p><strong>Hosted by:</strong> <span id="host-name"></span></p>
+        <p><strong>Event Time:</strong> <span id="event-time"></span></p>
+        <p><strong>Rooms:</strong> <span id="rooms"></span></p>
+        <p><strong>Detail:</strong></p>
+        <p id="detail"></p>
+        <p><strong>Created on:</strong> <span id="create-time"></span></p>
+    </div>
+</div>
+
+<script src="{% static 'detail.js' %}"></script>
+{% endblock %}

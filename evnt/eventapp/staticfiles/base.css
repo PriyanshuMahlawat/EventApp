@@ -1,0 +1,35 @@
+body{
+    margin: 0 auto;
+    max-width:302px;
+    padding: 10px;
+}
+#nav{
+    align-items: center;
+}
+#modal-outer{
+    position: fixed;
+    display: none;
+    width: 200px;
+    height: 100%;
+    overflow: auto;
+
+}
+#modal-btn{
+    width: 200px;
+    height: 20px;
+    z-index: 2;
+}
+#modal-inner{
+    
+    width: 200px;
+    height: 100%;
+    overflow: auto;
+}
+.content-wrap{
+    margin-bottom: -40px;
+    padding-bottom: 40px;
+}
+.footer{
+    height: 40px;
+    padding: 15px 0;
+}

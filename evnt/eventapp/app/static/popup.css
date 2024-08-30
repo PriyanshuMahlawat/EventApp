@@ -1,0 +1,74 @@
+.popup-content {
+    max-width: 500px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    font-family: 'Arial', sans-serif;
+}
+
+.popup-message.success {
+    color: #4CAF50; /* Green color for success */
+}
+
+.popup-message.error {
+    color: #F44336; /* Red color for error */
+}
+
+.popup-message p {
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+.popup-message ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.popup-message ul li {
+    font-size: 16px;
+    margin: 10px 0;
+}
+
+.popup-actions {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.popup-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    color: white;
+    background-color: #007BFF; /* Matching the base button color */
+    transition: background-color 0.3s ease;
+}
+
+.popup-btn:hover {
+    background-color: #0056b3; /* Darker shade on hover */
+}
+
+.retry-btn {
+    background-color: #FF9800; /* Orange for retry */
+}
+
+.retry-btn:hover {
+    background-color: #e68a00; /* Darker shade on hover */
+}
+
+@media (max-width: 600px) {
+    .popup-content {
+        width: 90%;
+        padding: 10px;
+    }
+
+    .popup-btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}

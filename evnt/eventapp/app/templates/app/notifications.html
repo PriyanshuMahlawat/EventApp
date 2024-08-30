@@ -1,0 +1,19 @@
+{% extends "app/base.html" %}
+{% load static %}
+{% block title %}Requests{% endblock %}
+
+{% block body_block %}
+<link rel="stylesheet" href="{% static 'noti.css' %}">
+<div class="notification-wrapper">
+    <h2>Event Requests</h2>
+    <p id="user_name" style="display: none;">{{ person }}</p>
+
+    <ul id="noti-list"></ul>
+</div>
+
+<script src="{% static 'noti.js' %}"></script>
+
+{% endblock %}
+{% block footer %}
+{{ block.super }}
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "app/base.html" %}
+{% load static %}
+{% block title %}Home{% endblock %}
+
+{% block body_block %}
+<link rel="stylesheet" href="{% static 'userpage.css' %}">
+
+<div class="content">
+    <p id="user_name" style="display: none;">{{ person }}</p>
+    <p id="email" style="display: none;">{{ email }}</p>
+    <ul id="event-list">
+        <!-- Events will be dynamically added here -->
+    </ul>
+</div>
+
+<div id="modal-outer1" class="modal-outer">
+    <div id="modal-inner1" class="modal-inner">
+        <p>Join request sent</p>
+        <p>Wait for the host to accept your request. Then you can access the event through the "My Events" tab.</p>
+        <button id="ok-btn1" class="modal-btn">OK</button>
+    </div>
+</div>
+
+<div id="modal-outer2" class="modal-outer">
+    <div id="modal-inner2" class="modal-inner">
+        <p>You can't join this event.</p>
+        <p>You need to be a BPHC student. Please check that you've logged in with your BITS-gmail.</p>
+        <button id="ok-btn2" class="modal-btn">OK</button>
+    </div>
+</div>
+
+<script src="{% static 'userpage.js' %}"></script>
+{% endblock %}
+
+{% block footer %}
+{{ block.super }}
+{% endblock %}

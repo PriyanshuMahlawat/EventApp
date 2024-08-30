@@ -1,0 +1,16 @@
+{% extends "app/base.html" %}
+{% load static %}
+{% block title %}Hosting Page{% endblock %}
+{% block body_block %}
+<link rel="stylesheet" href="{% static 'hostpage.css' %}">
+
+<p>Create your Event.</p>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ event_form.as_p }}
+    <input id="create-btn" type="submit" value="Publish">
+</form>
+
+<script src="{% static 'hostpage.js' %}"></script>
+{% endblock %}

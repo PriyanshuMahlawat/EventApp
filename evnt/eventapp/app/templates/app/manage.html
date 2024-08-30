@@ -1,0 +1,21 @@
+{% extends "app/base.html" %}
+{% load static %}
+{% block title %}ManagePage{% endblock %}
+
+{% block body_block %}
+<link rel="stylesheet" href="{% static 'manage.css' %}">
+
+<h1 id="event-name"></h1>
+<p id="host-name">By: </p>
+
+<div class="button-container">
+    <th><a href="{% url 'notipg' %}"><button >Requests</button></a></th>
+    <th><a href="{% url 'roles' %}"><button >Assign Roles</button></a></th>
+    <th><a href="#"><button >Admin</button></a></th>
+    <th><a href="#"><button >Manage Rooms and Lineup</button></a></th>
+    <th><a href="{% url 'editEvent' %}"><button >Edit Event</button></a></th>
+</div>
+
+<script src="{% static 'manage.js' %}"></script>
+
+{% endblock %}

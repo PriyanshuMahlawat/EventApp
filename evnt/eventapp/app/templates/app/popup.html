@@ -1,0 +1,44 @@
+{% extends "app/base.html" %}
+{% load static %}
+{% block title %}Popup Page{% endblock %}
+{% block body_block %}
+<link rel="stylesheet" href="{% static 'popup.css' %}">
+
+<div class="popup-content">
+    {% if success %}
+        <div class="popup-message success">
+            <p>Success <i class="fas fa-check-circle"></i></p>
+            <p>Your event "{{ event_name }}" is now:</p>
+            <ul>
+                <li>Visible to everyone</li>
+                <li>Only BPHC students can apply to join</li>
+                <li>You will have to accept their requests</li>
+            </ul>
+            <p>Further options will be available if you click on "View Event."</p>
+        </div>
+        <div class="popup-actions">
+            <a href="{% url 'index' %}"><button class="popup-btn">View Event</button></a>
+            <a href="{% url 'host' %}"><button class="popup-btn">Host New Event</button></a>
+        </div>
+    {% else %}
+        <div class="popup-message error">
+            <ul>
+                {% for e in error %}
+                    <li>{{ e }}</li>
+                
+            </ul>
+            {% empty %}
+                <p>Something went wrong. <i class="fas fa-meh"></i></p>
+                <p>Try again and make sure to fill out details properly.</p>
+            
+                {% endfor %}
+        </div>
+        <div class="popup-actions">
+            <a href="{% url 'host' %}"><button class="popup-btn retry-btn">Retry</button></a>
+            <a href="{% url 'index' %}"><button class="popup-btn">Home</button></a>
+        </div>
+    {% endif %}
+</div>
+
+<script src="{% static 'popup.js' %}"></script>
+{% endblock %}

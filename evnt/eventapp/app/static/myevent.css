@@ -1,0 +1,77 @@
+/* General styling for the page */
+body {
+    background-color: #f5f5f5;
+    font-family: 'Arial', sans-serif;
+    color: #333;
+    padding: 20px;
+}
+
+/* Styling for the page title */
+p {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* List styling */
+ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0 auto;
+    max-width: 600px;
+}
+
+/* List item styling */
+li {
+    padding: 15px;
+    margin-bottom: 15px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Paragraph inside list items */
+li p {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 500;
+    color: #444;
+}
+
+/* Button styling */
+button {
+    padding: 10px 15px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+/* Hover effect for buttons */
+button:hover {
+    background-color: #45a049;
+}
+
+/* Secondary button styling (e.g., delete buttons) */
+button.secondary {
+    background-color: #f44336;
+}
+
+button.secondary:hover {
+    background-color: #d32f2f;
+}
+
+/* Link styling */
+a {
+    text-decoration: none;
+}
+
+a button {
+    margin-left: 10px;
+}

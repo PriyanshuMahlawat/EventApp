@@ -1,0 +1,66 @@
+{% extends "app/base.html" %}
+{% load static %}
+{% block title %}Edit{% endblock %}
+
+{% block body_block %}
+<link rel="stylesheet" href="{% static 'editevent.css' %}">
+<h1>What do you want to change?</h1>
+<ul class="edit-list">
+    <li><button>Event Name</button></li>
+    <li><button>Event Thumbnail</button></li>
+    <li><button>Event Time</button></li>
+    <li><button>Rooms</button></li>
+    <li><button>Event Detail</button></li>
+</ul>
+
+<div id="modal-outer1">
+    <div id="modal-inner1">
+        <p>Give a new Event Name:</p>
+        <input id="name" type="text">
+        <button id="change1">Change</button>
+    </div>
+</div>
+
+<div id="modal-outer2">
+    <div id="modal-inner2">
+        <p>Give new Event_Thumbnail picture:</p>
+        <input id="image" type="file" accept="image/*">
+        <button id="change2">Change</button>
+    </div>
+</div>
+
+<div id="modal-outer3">
+    <div id="modal-inner3">
+        <p>Give a new Event Time:</p>
+        <input type="datetime-local" id="time" name="datetime" min="2024-09-01T00:00">
+        <button id="change3">Change</button>
+    </div>
+</div>
+
+<div id="modal-outer4">
+    <div id="modal-inner4">
+        <p>Give new set of Rooms:</p>
+        <input id="rooms" type="text">
+        <button id="change4">Change</button>
+    </div>
+</div>
+
+<div id="modal-outer5">
+    <div id="modal-inner5">
+        <p>Give new Detail:</p>
+        <textarea name="Detail" id="detail"></textarea>
+        <button id="change5">Change</button>
+    </div>
+</div>
+
+<div id="modal-outer-success">
+    <div id="modal-inner-success">
+        <div id="tick-mark">&#10003;</div> 
+        <p>Changes saved successfully!</p>
+        <button id="ok-button">OK</button>
+    </div>
+</div>
+
+<a href="{% url 'manageEvent' %}"><button class="done-button">Done</button></a>
+<script src="{% static 'editevent.js' %}"></script>
+{% endblock %}
