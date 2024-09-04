@@ -9,11 +9,23 @@
 <p id="host-name">By: </p>
 
 <div class="button-container">
-    <th><a href="{% url 'notipg' %}"><button >Requests</button></a></th>
-    <th><a href="{% url 'roles' %}"><button >Assign Roles</button></a></th>
-    <th><a href="#"><button >Admin</button></a></th>
-    <th><a href="#"><button >Manage Rooms and Lineup</button></a></th>
-    <th><a href="{% url 'editEvent' %}"><button >Edit Event</button></a></th>
+    {% if 1v %}
+    <th><a href="{% url 'notipg' %}"><button>Requests</button></a></th>
+    {% endif %}
+    
+    {% if host %}
+    <th><a href="{% url 'roles' %}"><button>Assign Roles</button></a></th>
+    {% endif %}
+
+    {% if live %}
+    <th><a href="#"><button>Event Live</button></a></th>
+    {% endif %}
+
+    <th><a href="{% url 'slots' %}"><button id="manage">Manage Slots</button></a></th>
+    
+    {% if 4v %}
+    <th><a href="{% url 'editEvent' %}"><button>Edit Event</button></a></th>
+    {% endif %}
 </div>
 
 <script src="{% static 'manage.js' %}"></script>

@@ -28,4 +28,6 @@ document.addEventListener("DOMContentLoaded", async function() {
     } else {
         console.error("EventId not found.");
     }
+
+    
 });

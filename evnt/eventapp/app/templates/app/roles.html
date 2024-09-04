@@ -6,18 +6,31 @@
 <link rel="stylesheet" href="{% static 'role.css' %}">
 <h1></h1>
 <p>Member Name:</p>
-<input type="text", placeholder="Search" id="search-input"><button id="s-btn">Search</button>
-<p id="membername"></p>
+<input type="text", placeholder="Search" id="search-input">
+<div id="membername">
+
+</div>
+<p id="pmember"></p>
 <p>Roles:</p>
 <p id="roles-list"><button id="b1" style="display: none;">Add Members</button><button id="b2" style="display: none;">Reallocate Members</button><button id="b3" style="display: none;">Remove Members</button><button id="b4" style="display: none;">Edit Event</button></p>
 <select name="Roles" id="roles">
-    <option id="o1" value="1">Add Memebers</option>
-    <option id="o2" value="2">Reallocate Members</option>
+    {% if 1 %}
+    <option id="o1" value="1">Can Accept Joinees</option>
+    {% endif %}
+    {% if 2 %}
+    <option id="o2" value="2">Allow Notifications</option>
+    {% endif %}
+    {% if 3 %}
     <option id="o3" value="3">Remove Members</option>
+    {% endif %}
+    {% if 4 %}
     <option id="o4" value="4">Edit Event</option>
+    {% endif %}
 </select>
 
 <button id="assign-btn">Assign</button>
+<p id="for-button"></p>
+
 
 
     <script src="{% static 'role.js' %}"></script>

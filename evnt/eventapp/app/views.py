@@ -1,11 +1,17 @@
 from django.shortcuts import render
+import requests
+from django.contrib.auth.models import User
+from rest_framework.permissions import IsAuthenticated
+from django.views.decorators.csrf import csrf_exempt
+import json
 from .forms import EventForm
-from .models import Event,Notifications,CurrentEvent
+from .models import Event,Notifications,CurrentEvent,slots
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_protect
 from rest_framework import generics
 from rest_framework.views import APIView
+from django.contrib.auth.models import Group
 
 
 from rest_framework.response import Response
@@ -19,8 +25,21 @@ from .serializers import (
     ManageEventSerializer,
     MembersListSerializer,
     CurrentEventSerializer,
+    slotsSerializer
 )
 
+
+
+def create_slots():
+    events = Event.objects.all()
+    for e in events:
+        id=e.id
+        str = e.members
+        arr = str.split(",")
+        for username in arr:
+            slots.objects.create(user=User.objects.get(username=username),event_id=id)
+
+create_slots()
 
 def index(request):
     person = request.user.username
@@ -43,17 +62,74 @@ def noti(request):
     person = request.user.username
     return render(request,"app/notifications.html",{"person":person})
 
+def slotspg(request):
+    host = False
+    event_id = request.COOKIES.get('event_id')
+    name=request.user.username
+    if(request.user.username == Event.objects.get(id = event_id).host.username):
+        host = True
+    return render(request,"app/slots.html",{"host":host,"name":name})
+
 def roles(request):
-    
     return render(request,"app/roles.html")
 
 
+
+@csrf_exempt
 def manage(request):
+    host = False
+    event_id = request.COOKIES.get('event_id')
+    
+    
+
+    try:
+        event = Event.objects.get(id=event_id)
+        if request.user.username == event.host.username:
+            host = True
+    except Event.DoesNotExist:
+        print("Event not found")
+        return render(request, "app/manage.html", {"error": "Event not found"})
+
     person = request.user.username
+    
     context = {
-        "person":person,
+        "person": person,
+        "live": False,
+        "1v": False,
+        "2v": False,
+        "3v": False,
+        "4v": False,
+        "host":False
     }
-    return render(request,"app/manage.html",context)
+    
+    if host:
+        
+        context["1v"] = True
+        context["2v"] = True
+        context["3v"] = True
+        context["4v"] = True
+        context["host"] = True
+
+    user = request.user
+    
+    print(user.groups.all())
+    if user.groups.filter(name="Add Members").exists():
+        context["1v"] = True
+    if user.groups.filter(name="Allow Noti").exists():
+        context["2v"] = True
+    if user.groups.filter(name="Remove Members").exists():
+        context["3v"] = True
+    if user.groups.filter(name="Edit Event").exists():
+        context["4v"] = True
+
+    
+    
+    
+    
+
+    return render(request, "app/manage.html", context)
+
+
 
 @login_required
 def hostpg(request):
@@ -93,6 +169,15 @@ def popup_view(request):
     return render(request,"app/popup.html",context)
 
 
+
+class SlotsDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = slots.objects.all()
+    serializer_class = slotsSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        
+        return slots.objects.get(user=self.request.user, event_id=self.kwargs['Event_Id'])
 
 
 class EventSerializerAPIView(generics.ListAPIView):
@@ -193,6 +278,8 @@ class ManageEventAPI(generics.RetrieveUpdateAPIView):
     serializer_class = ManageEventSerializer         
                         
 class CurrentEventAPIView(APIView):
+    
+
     def get(self, request):
         current_event, created = CurrentEvent.objects.get_or_create(user=request.user)
         serializer = CurrentEventSerializer(current_event)

@@ -1,0 +1,25 @@
+{% extends "app/base.html" %}
+{% load static %}
+{% block title %}Slots{% endblock %}
+{% block body_block %}
+<link rel="stylesheet" href="{% static 'slots.css' %}">
+
+<p style="display: none;" id="name">{{ name }}</p>
+
+{% if host %}
+<button id="suggest">Suggest Lineup</button>
+
+{% endif %}
+<p id="E-time">Event time is </p><br>
+<p>Whenever you are free or willing to work set your slots:</p>
+<div id="slot-div">
+    <p>Slot 1:</p>
+    <p>From:</p><input id="s1-from" type="time" >
+    <p>To:</p><input id="s1-to" type="time">
+</div>
+<button id="add-slots">Add Slot</button>
+<button id="submit-slots">Done!</button>
+
+
+<script src="{% static 'slots.js' %}"></script>
+{% endblock %}

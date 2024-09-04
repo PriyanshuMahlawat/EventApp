@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const csrftoken = getCookie('csrftoken');
 
 
-
+    
     
     fetch("http://localhost:8000/api/host/")
     .then(response => response.json())
@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", function() {
             let dellink = document.createElement("a");
             let managelink = document.createElement("a");
             let delEventBtn = document.createElement("button");
-            let manageBtn  = document.createElement("button");
+            let manageBtn = document.createElement("button");
 
             paraEl.textContent = arr[i].Event_name;
             deletehost = `http://localhost:8000/api/hostdel/${arr[i].id}/`; 
@@ -72,6 +72,14 @@ document.addEventListener("DOMContentLoaded", function() {
                     return response.json();
                 })
                 .then(data =>{
+                    console.log("before");
+                    const expirationDate = new Date();
+                    expirationDate.setTime(expirationDate.getTime() + (24*60 * 60 * 1000)); 
+                    document.cookie = `event_id=${arr[i].id}; expires=${expirationDate.toUTCString()}; path=/;`;
+
+                    
+                    console.log('success',data);
+                    console.log(document.cookie);
                     console.log('success',data);
                     window.location.href = "http://localhost:8000/manageEvent/";
                 })
@@ -133,6 +141,8 @@ document.addEventListener("DOMContentLoaded", function() {
             let listEl = document.createElement("li");
             let paraEl = document.createElement("p");
             let leavelink = document.createElement("a");
+            let managelink1 = document.createElement("a");
+            let manageBtn1 = document.createElement("button");
             let leaveEventBtn = document.createElement("button");
 
             paraEl.textContent = arr[i].Event_name;
@@ -159,12 +169,51 @@ document.addEventListener("DOMContentLoaded", function() {
                 });
             });
 
+            manageBtn1.textContent = "Manage";
+            manageBtn1.addEventListener("click",function(event){
+                event.preventDefault();
+                data = {
+                    'event_id':`${arr[i].id}`,
+                }
+                console.log(data)
+                fetch("http://localhost:8000/api/id/",{
+                    method:"POST",
+                    headers:{
+                        'Content-Type':'application/json',
+                        'X-CSRFToken':csrftoken,
+                    },
+                    body:JSON.stringify(data),
+                })
+                .then(response=>{
+                    if(!response.ok){
+                        throw new Error("Response not ok:",response.statusText)
+                    }
+                    return response.json();
+                })
+                .then(data =>{
+                    console.log("before");
+                    const expirationDate = new Date();
+                    expirationDate.setTime(expirationDate.getTime() + (60 * 60 * 1000)); 
+                    document.cookie = `event_id=${arr[i].id}; expires=${expirationDate.toUTCString()}; path=/;`;
+
+                    
+                    console.log('success',data);
+                    console.log(document.cookie);
+                    window.location.href = "http://localhost:8000/manageEvent/";
+                })
+                .catch(error=>{
+                    console.error("Error:",error);
+                })
+            })
+
             leavelink.href = "#"; 
             leaveEventBtn.textContent = "Leave Event";
 
             listEl.appendChild(paraEl);
             leavelink.appendChild(leaveEventBtn);
             listEl.appendChild(leavelink);
+            managelink1.appendChild(manageBtn1);
+            listEl.appendChild(managelink1);
             joinedlistEl.appendChild(listEl);
         }
     }

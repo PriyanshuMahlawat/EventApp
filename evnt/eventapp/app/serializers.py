@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Event,Notifications,CurrentEvent
+from .models import Event,Notifications,CurrentEvent,slots
 from django.contrib.auth.models import Group, User
 
 class EventSerializer(serializers.ModelSerializer):
@@ -16,6 +16,15 @@ class EventSerializer(serializers.ModelSerializer):
         roomArr = obj.rooms.replace(" ","")
         roomArr = roomArr.split(",")
         return roomArr
+
+
+class slotsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = slots
+        fields = ['user','event_id','slots']
+        read_only_fields = ['user']
+    
 
 
 class EventDetailSerializer(serializers.ModelSerializer):
@@ -54,14 +63,16 @@ class MembersListSerializer(serializers.ModelSerializer):
         if commaIndex != -1:
             username0 = permissionString[:commaIndex]
             roleString = permissionString[commaIndex +1:]
-
-        user = User.objects.filter(username = username0)    
+        print(username0)
+        print(roleString)
+        user = User.objects.get(username = username0)
+        print(user.first_name)    
         if roleString:
             if '1' in roleString:
                 group, created  = Group.objects.get_or_create(name='Add Members')
                 user.groups.add(group)
             if '2' in roleString:
-                group, created  = Group.objects.get_or_create(name='Reallocate Members')
+                group, created  = Group.objects.get_or_create(name='Allow Noti')
                 user.groups.add(group)
             if '3' in roleString:
                 group, created  = Group.objects.get_or_create(name='Remove Members')

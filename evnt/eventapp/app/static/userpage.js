@@ -68,11 +68,11 @@ document.addEventListener("DOMContentLoaded",function(){
             const okBtn2= document.getElementById("ok-btn2");
             joinbtn.addEventListener("click",function(event){
                 event.preventDefault();
-                let valid = false
+                let valid = true
                 console.log(email)
-                if(email.slice(9,37) == "@hyderabad.bits-pilani.ac.in"){
-                    valid = true
-                }
+                //if(email.slice(9,37) == "@hyderabad.bits-pilani.ac.in"){
+                //    valid = true
+               // }
                 console.log(valid)
                     
 

@@ -32,10 +32,10 @@ document.addEventListener("DOMContentLoaded", async function() {
             detail.textContent = data.Detail;
             createTime.textContent = new Date(data.create_time).toLocaleString();
             eventThumbnail.src = data.Event_Thumbnail;
-    })
-    .catch(error => {
-        console.error("Error:", error);
-    });
-    }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
+        }
     
 });

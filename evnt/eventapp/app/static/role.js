@@ -1,20 +1,17 @@
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", async function () {
     var dropdown = document.getElementById("roles");
     var searchinput = document.getElementById("search-input");
-    var searchBtn = document.getElementById("s-btn");
-    var pmember = document.getElementById("membername");
+    
+    var memdiv = document.getElementById("membername");
     var assignBtn = document.getElementById("assign-btn");
+    var pmember = document.getElementById("pmember");
     var b1 = document.getElementById("b1");
     var b2 = document.getElementById("b2");
     var b3 = document.getElementById("b3");
     var b4 = document.getElementById("b4");
     var Roles = [];
     var members1 = [];
-    let id;
-
-
-
-
+    let EId;
 
     function getCookie(name) {
         let cookieValue = null;
@@ -22,7 +19,6 @@ document.addEventListener("DOMContentLoaded", function() {
             const cookies = document.cookie.split(';');
             for (let i = 0; i < cookies.length; i++) {
                 const cookie = cookies[i].trim();
-                // Check if this cookie is the one we're looking for
                 if (cookie.substring(0, name.length + 1) === (name + '=')) {
                     cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
                     break;
@@ -31,107 +27,117 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         return cookieValue;
     }
-    
+
     const csrftoken = getCookie('csrftoken');
 
-
-
-
-
-
-    fetch("http://localhost:8000/api/id/")
-    .then(response=>response.json())
-    .then(data=>{
-        id = data.id;
-    })
-    .catch(error=>{console.error("Error",error)})
-
-
-
-    fetch(`http://localhost:8000/api/memberlist/${id}`)
-    .then(response=>response.json())
-    .then(data=>{
-        addtomembers(data);
-    })
-    .catch(error=>{console.error("Error:",error)});
-
-
-    searchBtn.addEventListener("click",function(){
-        var name = searchinput.value.toLowerCase();
-        var lowermembers = members1.map(function(item){
+    async function getid() {
+        try {
+            const response = await fetch("http://localhost:8000/api/id/")
+            const data = await response.json()
             
-            return item.toLowerCase();
-        })
-        if(name in lowermembers){
-            pmember.textContent = name;
-        }
-        else{
-            pmember.textContent = "No member with that name"
-        }
-    })
+            EId = data.event_id;
+        } catch (error) { console.error("Error", error) };
 
-    assignBtn.addEventListener("click",function(){
-        var rolesString = "";
-        for(let i=0;i<Roles.length;i++){
-            rolesString += Roles[i];
+    }
+    await getid();
+
+    if (EId) {
+        fetch(`http://localhost:8000/api/memberlist/${EId}`)
+            .then(response => response.json())
+            .then(data => {
+                addtomembers(data);
+            })
+            .catch(error => { console.error("Error:", error) });
+    }
+    var name;
+    searchinput.addEventListener("keyup", function (event) {
+        event.preventDefault();
+        name = searchinput.value.toLowerCase();
+        let n = name.length;
+        var lowermembers = members1.map(function (item) {
+            return item.toLowerCase().substring(0, n);
+        });
+    
+        memdiv.innerHTML = "";  
+    
+        if (lowermembers.includes(name)) {
+            for (let i = 0; i < lowermembers.length; i++) {
+                if (lowermembers[i] === name) {
+                    let memberBtn = document.createElement("button");
+                    memberBtn.textContent = members1[i];
+                    memdiv.appendChild(memberBtn);
+    
+                    
+                    memberBtn.addEventListener("click", function () {
+                        name = members1[i];  
+                        searchinput.value = name; 
+                        pmember.textContent = `Assigning Roles to ${name.toUpperCase()}` ;
+                        memdiv.innerHTML = "";  
+                    });
+                }
+            }
+        } else {
+            memdiv.textContent = "No member with that name";
         }
+    });
+    
+
+    assignBtn.addEventListener("click", function () {
+        var rolesString = Roles.join("");
         postData = {
-            "permission" : `${pmember.textContent}-${rolesString}`
-        }
+            "permission": `${name}-${rolesString}`
+        };
 
-        fetch(`http://localhost:8000/api/memberlistupdate/${id}`,{
-            method:'PATCH',
-            headers:{
+        fetch(`http://localhost:8000/api/memberlistupdate/${EId}/`, {
+            method: 'PATCH',
+            headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': csrftoken, 
+                'X-CSRFToken': csrftoken,
             },
-            body:JSON.stringify(postData),
+            body: JSON.stringify(postData),
         })
-        .then(response=>{
-            if(!response.ok){
-                throw new Error("Response not ok:",response.statusText)
-            }
-            return response.json();
-        })
-        .then(data =>{
-            console.log('success',data);
-            assignBtn.textContent = "Assign New";
-            let aTag = document.createElement("a");
-            let link = "{% url 'roles' %}"
-            aTag.href = link;
-            aTag.appendChild(assignBtn);
-            document.body.appendChild(aTag);
-        })
-        .catch(error=>{
-            console.error("Error:",error);
-        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Response not ok:", response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('success', data);
+                assignBtn.textContent = "Assign New";
+                let aTag = document.createElement("a");
+                let doneBtn = document.createElement("button");
+                doneBtn.textContent = "Done";
+                let link = "http://localhost:8000/manageEvent/";
+                aTag.href = link;
+                aTag.appendChild(doneBtn);
+                document.getElementById("for-button").appendChild(aTag);
+            })
+            .catch(error => {
+                console.error("Error:", error);
+            });
+    });
 
-    })
-
-
-    function addtomembers(arr){
-        
-            let members0 = arr.members.split(',')
-            for(let j=0;j<members0.length;j++){
-                members1.push(members0[j]);
-            }
-       
+    function addtomembers(arr) {
+        let members0 = arr.members.split(',');
+        for (let j = 0; j < members0.length; j++) {
+            members1.push(members0[j]);
+        }
     }
 
-
     function handleButtonClick(roleValue, button) {
-        return function(event) {
+        return function (event) {
             event.preventDefault();
             button.style.display = "none";
             let index = Roles.indexOf(roleValue);
             if (index !== -1) {
-                Roles.splice(index, 1); 
-                console.log(Roles); 
+                Roles.splice(index, 1);
+                console.log(Roles);
             }
         };
     }
-    
-    dropdown.addEventListener("change", function(event) {
+
+    dropdown.addEventListener("change", function (event) {
         event.preventDefault();
         var selectedValue = dropdown.value;
         let button, roleValue;
@@ -157,17 +163,11 @@ document.addEventListener("DOMContentLoaded", function() {
                 return;
         }
 
-        if (Roles.indexOf(roleValue) === -1) {
+        if (button && Roles.indexOf(roleValue) === -1) {
             Roles.push(roleValue);
-            console.log(Roles); 
+            console.log(Roles);
+            button.style.display = "block";
+            button.addEventListener("click", handleButtonClick(roleValue, button));
         }
-        
-        button.style.display = "block";
-
-        
-        
-        
-        
-        button.addEventListener("click", handleButtonClick(roleValue, button));
     });
 });
