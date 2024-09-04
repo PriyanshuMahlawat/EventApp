@@ -8,7 +8,40 @@
 
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    {{ event_form.as_p }}
+    <div class="form-group">
+        {{ event_form.Event_name.label_tag }}
+        {{ event_form.Event_name }}
+    </div>
+    
+    <div class="form-group">
+        {{ event_form.event_duration.label_tag }}
+        {{ event_form.event_duration }}
+        <small class="form-text text-muted">Enter duration (e.g., 2:00:00 for 2 hours)</small>
+    </div>
+
+    <div class="form-group">
+        {{ event_form.event_time.label_tag }}
+        {{ event_form.event_time }}
+    </div>
+
+    <div class="form-group">
+        {{ event_form.Event_Thumbnail.label_tag }}
+        {{ event_form.Event_Thumbnail }}
+        <small class="form-text text-muted">Photo is Optional</small>
+    </div>
+
+    <div class="form-group">
+        {{ event_form.rooms.label_tag }}
+        {{ event_form.rooms }}
+        <small class="form-text text-muted">Ex: J107,G102,F107,NFG,OFG,etc...</small>
+    </div>
+
+    <div class="form-group">
+        {{ event_form.Detail.label_tag }}
+        {{ event_form.Detail }}
+        <small class="form-text text-muted">Optional but recommended</small>
+    </div>
+
     <input id="create-btn" type="submit" value="Publish">
 </form>
 

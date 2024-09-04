@@ -137,16 +137,17 @@ class JoinedEventsSerializer(serializers.ModelSerializer):
 
     def get_joined_Events(self,obj):
         request = self.context.get('request')
-        if request:
+        if request and request.user.is_authenticated:
             joined_Events = []
             user_name = request.user.username
             for e in Event.objects.all():
-                if e.members and user_name in e.members:
+                boo = user_name in e.members
+                if e.members and boo:
                     joined_Events.append({
                     'id': e.id,
                     'Event_name': e.Event_name
                     })
-        return joined_Events        
+            return joined_Events        
 
         return []
     

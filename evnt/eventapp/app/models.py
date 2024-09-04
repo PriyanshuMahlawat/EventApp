@@ -8,7 +8,8 @@ class Event(models.Model):
     Event_Thumbnail = models.ImageField(upload_to="EventPhotos/",blank = True,null=True)
     create_time = models.DateTimeField(auto_now_add=True)
     event_time = models.DateTimeField(blank=False)
-    rooms = models.CharField(blank=False,max_length=1002)
+    event_duration = models.DurationField(blank=False)
+    rooms = models.CharField(blank=False,max_length=1000)
     Detail = models.TextField(blank=True,null=True)
     members = models.CharField(max_length=10000,null=True)
 

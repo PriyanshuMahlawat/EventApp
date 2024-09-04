@@ -67,3 +67,9 @@ form textarea::placeholder {
     color: #888;
     font-style: italic;
 }
+
+/* Help text styling */
+.form-text {
+    font-size: 14px;
+    color: #6c757d;
+}

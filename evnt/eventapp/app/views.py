@@ -9,6 +9,8 @@ from .models import Event,Notifications,CurrentEvent,slots
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_protect
+from allauth.socialaccount.models import SocialAccount
+
 from rest_framework import generics
 from rest_framework.views import APIView
 from django.contrib.auth.models import Group
@@ -33,50 +35,145 @@ from .serializers import (
 def create_slots():
     events = Event.objects.all()
     for e in events:
-        id=e.id
-        str = e.members
-        arr = str.split(",")
-        for username in arr:
-            slots.objects.create(user=User.objects.get(username=username),event_id=id)
+        event_id = e.id
+        usernames = e.members.split(",") 
+        
+        for username in usernames:
+            
+            user = User.objects.get(username=username)
+            
+            
+            if not slots.objects.filter(user=user, event_id=event_id).exists():
+                slots.objects.create(user=user, event_id=event_id)
+            else:
+                print(f"Slot for user {username} and event {event_id} already exists.")
+
 
 create_slots()
 
 def index(request):
-    person = request.user.username
-    email = request.user.email
-    return render(request,"app/userpage.html",{"person":person,"email":email})
+    logged_in = False
+    image_url = None
+    if request.user.is_authenticated:
+        logged_in =True
+        person = request.user.username
+        email = request.user.email
+       
+        social_account = SocialAccount.objects.get(user=request.user)
+        data = social_account.extra_data
+        image_url = data.get('picture')
+        
+
+
+        
+    else:
+        person = None
+        email = None
+    return render(request,"app/userpage.html",{"person":person,"email":email,"logged_in":logged_in,"image_url":image_url})
 
 def myeventtab(request):
-    return render(request,"app/myevent.html")
+    logged_in = False
+    image_url = None
+    if request.user.is_authenticated:
+        logged_in =True
+        
+       
+        social_account = SocialAccount.objects.get(user=request.user)
+        data = social_account.extra_data
+        image_url = data.get('picture')
+    return render(request,"app/myevent.html",{"logged_in":logged_in,"image_url":image_url})
 
 def about(request):
-    return render(request,'app/about.html')
+    logged_in = False
+    image_url = None
+    if request.user.is_authenticated:
+        logged_in =True
+        
+       
+        social_account = SocialAccount.objects.get(user=request.user)
+        data = social_account.extra_data
+        image_url = data.get('picture')
+    return render(request,'app/about.html',{"logged_in":logged_in,"image_url":image_url})
 
 def editEvent(request):
-    return render(request,"app/editevent.html")
+    logged_in = False
+    image_url = None
+    if request.user.is_authenticated:
+        logged_in =True
+        
+       
+        social_account = SocialAccount.objects.get(user=request.user)
+        data = social_account.extra_data
+        image_url = data.get('picture')
+    return render(request,"app/editevent.html",{"logged_in":logged_in,"image_url":image_url})
 
 def DetailEvent(request):
-    return render(request,"app/eventdetail.html")
+    logged_in = False
+    image_url = None
+    if request.user.is_authenticated:
+        logged_in =True
+        
+       
+        social_account = SocialAccount.objects.get(user=request.user)
+        data = social_account.extra_data
+        image_url = data.get('picture')
+    return render(request,"app/eventdetail.html",{"logged_in":logged_in,"image_url":image_url})
 
 def noti(request):
+    logged_in = False
+    image_url = None
+    if request.user.is_authenticated:
+        logged_in =True
+        
+       
+        social_account = SocialAccount.objects.get(user=request.user)
+        data = social_account.extra_data
+        image_url = data.get('picture')
     person = request.user.username
-    return render(request,"app/notifications.html",{"person":person})
+    return render(request,"app/notifications.html",{"person":person,"logged_in":logged_in,"image_url":image_url})
 
 def slotspg(request):
+    logged_in = False
+    image_url = None
+    if request.user.is_authenticated:
+        logged_in =True
+        
+       
+        social_account = SocialAccount.objects.get(user=request.user)
+        data = social_account.extra_data
+        image_url = data.get('picture')
     host = False
     event_id = request.COOKIES.get('event_id')
     name=request.user.username
     if(request.user.username == Event.objects.get(id = event_id).host.username):
         host = True
-    return render(request,"app/slots.html",{"host":host,"name":name})
+    return render(request,"app/slots.html",{"host":host,"name":name,"logged_in":logged_in,"image_url":image_url})
 
 def roles(request):
-    return render(request,"app/roles.html")
+    logged_in = False
+    image_url = None
+    if request.user.is_authenticated:
+        logged_in =True
+        
+       
+        social_account = SocialAccount.objects.get(user=request.user)
+        data = social_account.extra_data
+        image_url = data.get('picture')
+    return render(request,"app/roles.html",{"logged_in":logged_in,"image_url":image_url})
 
 
 
 @csrf_exempt
 def manage(request):
+    logged_in = False
+    image_url = None
+    if request.user.is_authenticated:
+        logged_in =True
+        
+       
+        social_account = SocialAccount.objects.get(user=request.user)
+        data = social_account.extra_data
+        image_url = data.get('picture')
     host = False
     event_id = request.COOKIES.get('event_id')
     
@@ -122,7 +219,8 @@ def manage(request):
     if user.groups.filter(name="Edit Event").exists():
         context["4v"] = True
 
-    
+    context["logged_in"] = logged_in
+    context["image_url"] = image_url
     
     
     
@@ -133,6 +231,15 @@ def manage(request):
 
 @login_required
 def hostpg(request):
+    logged_in = False
+    image_url = None
+    if request.user.is_authenticated:
+        logged_in =True
+        
+       
+        social_account = SocialAccount.objects.get(user=request.user)
+        data = social_account.extra_data
+        image_url = data.get('picture')
     success = request.session.pop('success', False)
     error = request.session.pop('error', [])
     event_name = request.session.pop('event_name', None)
@@ -156,16 +263,29 @@ def hostpg(request):
         "event_form": event_form,
         "success": success,
         "error": error,
-        "event_name": event_name
+        "event_name": event_name,
+        "logged_in":logged_in,
+        "image_url":image_url,
     })
 
 
 @csrf_protect
 def popup_view(request):
+    logged_in = False
+    image_url = None
+    if request.user.is_authenticated:
+        logged_in =True
+        
+       
+        social_account = SocialAccount.objects.get(user=request.user)
+        data = social_account.extra_data
+        image_url = data.get('picture')
     context = {}
     context['success'] =request.session.get('success',False)
     context['event_name'] =request.session.get('event_name',None)
     context['error'] =request.session.get('error',[])
+    context['logged_in'] = logged_in
+    context['image_url'] = image_url
     return render(request,"app/popup.html",context)
 
 
@@ -254,7 +374,12 @@ class JoinedAPIView(generics.ListAPIView):
     queryset = Event.objects.all()
     serializer_class = JoinedEventsSerializer
 
-
+    def get_serializer_context(self):
+        context =  super().get_serializer_context() 
+        context.update({
+            "request":self.request,
+        }) 
+        return context 
 
 class LeaveEventAPIView(APIView):
     def delete(self, request, event_id):
