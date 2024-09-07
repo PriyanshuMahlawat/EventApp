@@ -85,9 +85,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     assignBtn.addEventListener("click", function () {
         var rolesString = Roles.join("");
         postData = {
-            "permission": `${name}-${rolesString}`
+            "permission": `${name}-${rolesString}:${EId}`
         };
-
+        
         fetch(`http://localhost:8000/api/memberlistupdate/${EId}/`, {
             method: 'PATCH',
             headers: {

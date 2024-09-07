@@ -10,7 +10,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_protect
 from allauth.socialaccount.models import SocialAccount
-
+from django.db import IntegrityError
 from rest_framework import generics
 from rest_framework.views import APIView
 from django.contrib.auth.models import Group
@@ -32,24 +32,34 @@ from .serializers import (
 
 
 
+
+
+from django.db import IntegrityError
+
 def create_slots():
     events = Event.objects.all()
     for e in events:
         event_id = e.id
-        usernames = e.members.split(",") 
-        
-        for username in usernames:
-            
-            user = User.objects.get(username=username)
-            
-            
-            if not slots.objects.filter(user=user, event_id=event_id).exists():
-                slots.objects.create(user=user, event_id=event_id)
-            else:
-                print(f"Slot for user {username} and event {event_id} already exists.")
+        memberstr = e.members
+        if memberstr:
+            usernames = memberstr.split(",")
+            for username in usernames:
+                print(username)
+                print(event_id)
+                try:
+                    user = User.objects.get(username=username)
+                    slot, created = slots.objects.get_or_create(user=user, event_id=event_id)
+                    if created:
+                        print(f"Slot for user {username} and event {event_id} created.")
+                    else:
+                        print(f"Slot for user {username} and event {event_id} already exists.")
+                except User.DoesNotExist:
+                    print(f"User with username {username} does not exist.")
+                except IntegrityError as e:
+                    print(f"IntegrityError: {e} for user {username} and event {event_id}.")
 
 
-create_slots()
+
 
 def index(request):
     logged_in = False
@@ -62,10 +72,7 @@ def index(request):
         social_account = SocialAccount.objects.get(user=request.user)
         data = social_account.extra_data
         image_url = data.get('picture')
-        
-
-
-        
+   
     else:
         person = None
         email = None
@@ -147,7 +154,10 @@ def slotspg(request):
     name=request.user.username
     if(request.user.username == Event.objects.get(id = event_id).host.username):
         host = True
+    
     return render(request,"app/slots.html",{"host":host,"name":name,"logged_in":logged_in,"image_url":image_url})
+
+
 
 def roles(request):
     logged_in = False
@@ -210,19 +220,20 @@ def manage(request):
     user = request.user
     
     print(user.groups.all())
-    if user.groups.filter(name="Add Members").exists():
+    if user.groups.filter(name=f"Add Members{event_id}").exists():
         context["1v"] = True
-    if user.groups.filter(name="Allow Noti").exists():
+    if user.groups.filter(name=f"Allow Noti{event_id}").exists():
         context["2v"] = True
-    if user.groups.filter(name="Remove Members").exists():
+    if user.groups.filter(name=f"Remove Members{event_id}").exists():
         context["3v"] = True
-    if user.groups.filter(name="Edit Event").exists():
+    if user.groups.filter(name=f"Edit Event{event_id}").exists():
         context["4v"] = True
 
     context["logged_in"] = logged_in
     context["image_url"] = image_url
     
-    
+    print(context)
+    print(f"Edit Event{event_id}")
     
 
     return render(request, "app/manage.html", context)
@@ -294,11 +305,12 @@ class SlotsDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = slots.objects.all()
     serializer_class = slotsSerializer
     permission_classes = [IsAuthenticated]
-
+    
     def get_object(self):
-        
-        return slots.objects.get(user=self.request.user, event_id=self.kwargs['Event_Id'])
-
+        try:
+            return slots.objects.get(user=self.request.user, event_id=self.kwargs['Event_id'])
+        except slots.DoesNotExist:
+            return None
 
 class EventSerializerAPIView(generics.ListAPIView):
     queryset = Event.objects.all()
@@ -346,16 +358,20 @@ class HostedEventsUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
 class membersRetrieveAPIView(generics.RetrieveAPIView):
     queryset = Event.objects.all()
     serializer_class = MembersListSerializer
+    
 
 
 class membersUpdateAPIView(generics.UpdateAPIView):
     queryset = Event.objects.all()
     serializer_class = MembersListSerializer
+    
+
 
 class AddmembersAPIView(generics.UpdateAPIView):
     queryset = Event.objects.all()
-    serializer_class = AddingMembersSerializer 
+    serializer_class = AddingMembersSerializer
 
+    
     def update(self,request,*args,**kwargs):
         instance  =self.get_object()
         new_member = request.data.get('members','')
@@ -367,6 +383,7 @@ class AddmembersAPIView(generics.UpdateAPIView):
 
         instance.save()
         serializer = self.get_serializer(instance)
+        create_slots()
         return Response(serializer.data)      
 
 
@@ -398,10 +415,16 @@ class LeaveEventAPIView(APIView):
             return Response({"error": "Event not found."}, status=404)
 
 
+
+
+
+
 class ManageEventAPI(generics.RetrieveUpdateAPIView):
     queryset = Event.objects.all()
     serializer_class = ManageEventSerializer         
-                        
+
+
+
 class CurrentEventAPIView(APIView):
     
 

@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Event,Notifications,CurrentEvent,slots
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import Group, User, Permission
+from django.contrib.contenttypes.models import ContentType
 
 class EventSerializer(serializers.ModelSerializer):
     host_name = serializers.SerializerMethodField()
@@ -58,28 +59,61 @@ class MembersListSerializer(serializers.ModelSerializer):
         fields = ['id','members','permission']  
 
     def update(self,instance,validated_data):
+        print(validated_data)
         permissionString = validated_data.get('permission')
-        commaIndex = permissionString.find('-')
-        if commaIndex != -1:
-            username0 = permissionString[:commaIndex]
-            roleString = permissionString[commaIndex +1:]
-        print(username0)
-        print(roleString)
-        user = User.objects.get(username = username0)
-        print(user.first_name)    
+        former = permissionString.split(':')[0]
+        id = permissionString.split(':')[1]
+        username0 = former.split('-')[0]
+        roleString = former.split('-')[1]
+        
+        
+        
+        user = User.objects.get(username=username0)
+        
+          
         if roleString:
+            event_content_type = ContentType.objects.get_for_model(Event)
             if '1' in roleString:
-                group, created  = Group.objects.get_or_create(name='Add Members')
+                group, created  = Group.objects.get_or_create(name=f'Add Members{id}')
+                perms = ['add_event','view_event','add_notifications','view_notifications','delete_notifications','change_notifications']
+                for perm in perms:
+
+                    permission = Permission.objects.get(codename =perm,content_type=event_content_type ) 
+                    group.permissions.add(permission)
+
+                group.save()
                 user.groups.add(group)
             if '2' in roleString:
-                group, created  = Group.objects.get_or_create(name='Allow Noti')
+                group, created  = Group.objects.get_or_create(name=f'Allow Noti{id}')
+                perms = ['add_event','view_event']
+                for perm in perms:
+
+                    permission = Permission.objects.get(codename =perm,content_type=event_content_type ) 
+                    group.permissions.add(permission)
+
+                group.save()                
                 user.groups.add(group)
             if '3' in roleString:
-                group, created  = Group.objects.get_or_create(name='Remove Members')
+                group, created  = Group.objects.get_or_create(name=f'Remove Members{id}')
+                perms = ['add_event','view_event']
+                for perm in perms:
+
+                    permission = Permission.objects.get(codename =perm,content_type=event_content_type ) 
+                    group.permissions.add(permission)
+
+                group.save()
                 user.groups.add(group)
             if '4' in roleString:
-                group, created  = Group.objects.get_or_create(name='Edit Event')
+                group, created  = Group.objects.get_or_create(name=f'Edit Event{id}')
+                perms = ['add_event','view_event','change_event','delete_event']
+                for perm in perms:
+
+                    permission = Permission.objects.get(codename =perm,content_type=event_content_type ) 
+                    group.permissions.add(permission)
+
+                group.save()
                 user.groups.add(group) 
+                
 
             user.save()
         return instance  
@@ -141,7 +175,10 @@ class JoinedEventsSerializer(serializers.ModelSerializer):
             joined_Events = []
             user_name = request.user.username
             for e in Event.objects.all():
-                boo = user_name in e.members
+                
+                memberStr = e.members
+                memberArray = memberStr.split(",")
+                boo = user_name in memberArray
                 if e.members and boo:
                     joined_Events.append({
                     'id': e.id,

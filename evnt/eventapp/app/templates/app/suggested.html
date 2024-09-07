@@ -1,0 +1,12 @@
+{% extends "app/base.html" %}
+{% load static %}
+{% block title %}Suggested{% endblock %}
+{% block body_block %}
+<link rel="stylesheet" href="{% static 'suggested.css' %}">
+
+<p>Suggested Lineup!</p>
+<p>Note: 1.You can edit this Table.</p><br>
+<p>2.Finalise 'only' when you don't want any changes.</p>
+
+<script src="{% static 'suggested.js' %}"></script>
+{% endblock %}

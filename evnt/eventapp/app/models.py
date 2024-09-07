@@ -35,8 +35,12 @@ class CurrentEvent(models.Model):
     event_id = models.IntegerField(null=True, blank=True)
        
 class slots(models.Model):
-    user = models.OneToOneField(User,on_delete=models.CASCADE)
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
     event_id = models.IntegerField(null=True,blank=True)
     slots = models.JSONField(blank=True,null=True)
 
 
+class table(models.Model):
+    user = models.OneToOneField(User,on_delete=models.CASCADE)
+    
+    slot = models.JSONField(blank=True,null=True)
