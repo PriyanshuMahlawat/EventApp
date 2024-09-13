@@ -1,7 +1,9 @@
 from rest_framework import serializers
-from .models import Event,Notifications,CurrentEvent,slots
+from .models import Event,Notifications,CurrentEvent,slots,completedEvents,RealTable
 from django.contrib.auth.models import Group, User, Permission
 from django.contrib.contenttypes.models import ContentType
+from datetime import datetime
+import pytz
 
 class EventSerializer(serializers.ModelSerializer):
     host_name = serializers.SerializerMethodField()
@@ -43,6 +45,7 @@ class EventDetailSerializer(serializers.ModelSerializer):
         roomArr = roomArr.split(",")
         return roomArr
     
+
 
 class AddingMembersSerializer(serializers.ModelSerializer):
     
@@ -211,3 +214,106 @@ class CurrentEventSerializer(serializers.ModelSerializer):
     class Meta:
         model = CurrentEvent
         fields = ['event_id']
+
+
+class CompletedEventsSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model =completedEvents
+        fields = ['excel','event_id','Event_name']
+
+        
+
+
+
+
+
+class tableSlotSerializer(serializers.ModelSerializer):
+    slot = serializers.SerializerMethodField()
+    class Meta:
+        model = Event
+        fields = ['slot']
+
+    def get_slot(self,obj):
+        
+        event_id = self.context.get('id')
+        event = Event.objects.get(id=event_id)
+        roomsArr = event.rooms.split(',')
+        EstartTime = event.event_time
+        EendTime = EstartTime + event.event_duration
+        eventSlots = slots.objects.filter(event_id=event_id)
+        timezone = pytz.timezone('Asia/Kolkata')
+        
+        
+        EstartTime = EstartTime.astimezone(timezone)
+        
+        EendTime = EendTime.astimezone(timezone)
+        tableSlot = {}
+        remaining_event_slots = list(eventSlots)
+
+        for room in roomsArr:
+            tableSlot[room] = []  
+            tableSlot[room].append({None: (EstartTime, EendTime)})
+            
+            for slot in remaining_event_slots:
+                
+                for key, time in slot.slots.items():
+                    username = slot.user.username
+                    starttime_str, endTime_str = time.strip('()').split(',')
+                    starttime = datetime.strptime(starttime_str.strip(), '%H:%M')
+                    endTime = datetime.strptime(endTime_str.strip(), '%H:%M')
+                    if starttime.tzinfo is None:
+                        starttime = timezone.localize(starttime)
+                    if endTime.tzinfo is None:
+                        endTime = timezone.localize(endTime)
+
+
+
+                    if starttime == EstartTime and tableSlot[room][0].get(None):                        
+                        tableSlot[room][0] = {username: (starttime.time(), endTime.time())}
+                        
+
+                    elif (
+                        starttime != EstartTime 
+                        and list(tableSlot[room][0].keys())[0] is None 
+                        and len(tableSlot[room])==1
+                    ):       
+                        
+                        tableSlot[room].insert(1, {username: (starttime, endTime)})
+                        
+                    
+                    elif starttime != EstartTime:
+                        print("this")
+                        
+                        tableSlot[room].append({username: (starttime, endTime)})
+                remaining_event_slots.remove(slot)        
+            
+            
+            last_slot = tableSlot[room][-1]
+            last_end_time = last_slot.get(list(last_slot.keys())[0])[1]
+           
+            
+            if last_end_time < EendTime:
+                
+                
+                tableSlot[room].append({None: (last_end_time, EendTime)})
+                
+            
+                
+        return tableSlot
+
+    
+        
+class CurrentTableSerializer(serializers.Serializer):
+    table = serializers.DictField(child=serializers.ListField(child=serializers.CharField()), allow_empty=True)
+
+class RealTableSerializer(serializers.ModelSerializer):
+   class Meta:
+       model = RealTable
+       fields = ['event_id','table']
+
+    
+
+
+    
+        

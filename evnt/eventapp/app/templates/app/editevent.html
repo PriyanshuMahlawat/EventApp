@@ -36,7 +36,8 @@
         <button id="change3">Change</button>
     </div>
 </div>
-
+<div id="timer-start" data-value="{{ timer_start }}"></div>
+<div id="timer-duration" data-value="{{ duration }}"></div>
 <div id="modal-outer4">
     <div id="modal-inner4">
         <p>Give new set of Rooms:</p>
@@ -60,7 +61,12 @@
         <button id="ok-button">OK</button>
     </div>
 </div>
-
+<div id="modalOuterEndEvent" style="display: none;">
+    <div id="modalInnerEndEvent">
+        <p>The event is over now. A report of the event has been generated in the form of an Excel sheet.</p>
+        <button id="check-report-btn">Check Report</button>
+    </div>
+</div>
 <a href="{% url 'manageEvent' %}"><button class="done-button">Done</button></a>
 <script src="{% static 'editevent.js' %}"></script>
 {% endblock %}

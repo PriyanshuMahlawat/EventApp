@@ -18,16 +18,26 @@
     {% endif %}
 
     {% if live %}
-    <th><a href="#"><button>Event Live</button></a></th>
+    <th><a href="{% url 'adminpage' %}"><button>Event Live</button></a></th>
     {% endif %}
-
+    {% if host %}
+    <th><a href="{% url 'suggested' %}"><button id="suggest">Suggest Lineup</button>
+    </a></th>
+    {% else %}
     <th><a href="{% url 'slots' %}"><button id="manage">Manage Slots</button></a></th>
-    
+    {% endif %}
     {% if 4v %}
     <th><a href="{% url 'editEvent' %}"><button>Edit Event</button></a></th>
     {% endif %}
 </div>
-
+<div id="modalOuterEndEvent" style="display: none;">
+    <div id="modalInnerEndEvent">
+        <p>The event is over now. A report of the event has been generated in the form of an Excel sheet.</p>
+        <button id="check-report-btn">Check Report</button>
+    </div>
+</div>
+<div id="timer-start" data-value="{{ timer_start }}"></div>
+<div id="timer-duration" data-value="{{ duration }}"></div>
 <script src="{% static 'manage.js' %}"></script>
 
 {% endblock %}

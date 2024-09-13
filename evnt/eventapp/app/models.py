@@ -5,7 +5,7 @@ from django.utils import timezone
 class Event(models.Model):
     host = models.ForeignKey(User,on_delete=models.CASCADE)
     Event_name = models.CharField(blank=False,max_length=150)
-    Event_Thumbnail = models.ImageField(upload_to="EventPhotos/",blank = True,null=True)
+    Event_Thumbnail = models.ImageField(upload_to="EventPhotos/",blank = True,null=True,default='EventPhotos/def2.webp')
     create_time = models.DateTimeField(auto_now_add=True)
     event_time = models.DateTimeField(blank=False)
     event_duration = models.DurationField(blank=False)
@@ -21,7 +21,7 @@ class Event(models.Model):
         
         
 class Notifications(models.Model):
-    Event = models.ForeignKey(Event,on_delete=models.CASCADE)
+    Event = models.ForeignKey(Event,on_delete=models.DO_NOTHING)
     name = models.CharField(max_length=50)
     create_time = models.CharField(max_length=250)
 
@@ -31,16 +31,24 @@ class Notifications(models.Model):
 
    
 class CurrentEvent(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.DO_NOTHING)
     event_id = models.IntegerField(null=True, blank=True)
        
 class slots(models.Model):
-    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    user = models.ForeignKey(User,on_delete=models.DO_NOTHING)
     event_id = models.IntegerField(null=True,blank=True)
     slots = models.JSONField(blank=True,null=True)
 
 
-class table(models.Model):
-    user = models.OneToOneField(User,on_delete=models.CASCADE)
-    
-    slot = models.JSONField(blank=True,null=True)
+class completedEvents(models.Model):
+    id = models.AutoField(primary_key=True)
+    excel= models.FileField(upload_to='excelSheets/')
+    event_id = models.IntegerField()
+    host = models.CharField(max_length=100)
+    Event_name = models.CharField(blank=False,max_length=150)
+    members = models.CharField(max_length=10000,null=True)
+
+
+class RealTable(models.Model):
+    event_id = models.IntegerField(unique=True)
+    table = models.JSONField()

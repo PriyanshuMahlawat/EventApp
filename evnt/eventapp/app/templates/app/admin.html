@@ -1,0 +1,40 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="{% static 'admin.css' %}">
+    <title>Admin Live</title>
+</head>
+<body>
+    <div id="timer-start" data-value="{{ timer_start }}"></div>
+<div id="timer-duration" data-value="{{ duration }}"></div>
+    <p style="display: none;" id="name">{{ username }}</p>
+    
+    <table id="table"></table>
+    <script src="{% static 'admin.js' %}"></script>
+</body>
+<div id="modalOuterEnter">
+    <div id="modalInnerEnter">
+        You need to leave a room to be present in the other. Right?
+        <button id="ok-btnEnter">Ok</button>
+    </div>
+</div>
+
+<div id="modalOuterLeave">
+    <div id="modalInnerLeave">
+        You need to be in a room to leave. Right?
+        <button id="ok-btnLeave">Ok</button>
+    </div>
+</div>
+
+<div id="modalOuterEndEvent" style="display: none;">
+    <div id="modalInnerEndEvent">
+        <p>The event is over now. A report of the event has been generated in the form of an Excel sheet.</p>
+        <button id="check-report-btn">Check Report</button>
+    </div>
+</div>
+
+</html>

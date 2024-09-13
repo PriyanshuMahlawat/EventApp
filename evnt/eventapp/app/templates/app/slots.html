@@ -6,12 +6,17 @@
 
 <p style="display: none;" id="name">{{ name }}</p>
 
-{% if host %}
-<button id="suggest">Suggest Lineup</button>
-
-{% endif %}
+<div id="modalOuterEndEvent" style="display: none;">
+    <div id="modalInnerEndEvent">
+        <p>The event is over now. A report of the event has been generated in the form of an Excel sheet.</p>
+        <button id="check-report-btn">Check Report</button>
+    </div>
+</div>
+<div id="timer-start" data-value="{{ timer_start }}"></div>
+<div id="timer-duration" data-value="{{ duration }}"></div>
 <p id="E-time">Event time is </p><br>
-<p>Whenever you are free or willing to work set your slots:</p>
+<p>Whenever you are free or willing to work set your slots:</p><br>
+<p>Note: Make sure to add slots in order, you can always come back and update slots.</p>
 <div id="slot-div">
     <p>Slot 1:</p>
     <p>From:</p><input id="s1-from" type="time" >
@@ -19,6 +24,7 @@
 </div>
 <button id="add-slots">Add Slot</button>
 <button id="submit-slots">Done!</button>
+
 
 
 <script src="{% static 'slots.js' %}"></script>

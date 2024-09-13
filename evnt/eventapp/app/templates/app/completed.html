@@ -1,0 +1,23 @@
+{% extends "app/base.html" %}
+{% load static %}
+{% block title %}Completed Events{% endblock %}
+
+{% block body_block %}
+<link rel="stylesheet" href="{% static 'completed.css' %}">
+<p id="username" style="display: none;">{{ username }}</p>
+{% if host %}
+<p id="check" style="display: none;">1</p>
+{% else %}
+<p id="check" style="display: none;">0</p>
+{% endif %}
+<p>Hosted History:</p>
+<ul id="hosted-list"></ul>
+
+<p>Participation History:</p>
+<ul id="joined-list"></ul>
+
+<script src="{% static 'completed.js' %}"></script>
+{% endblock %}
+
+
+

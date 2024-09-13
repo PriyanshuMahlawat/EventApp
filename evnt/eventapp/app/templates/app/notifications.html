@@ -10,9 +10,15 @@
 
     <ul id="noti-list"></ul>
 </div>
-
+<div id="timer-start" data-value="{{ timer_start }}"></div>
+<div id="timer-duration" data-value="{{ duration }}"></div>
 <script src="{% static 'noti.js' %}"></script>
-
+<div id="modalOuterEndEvent" style="display: none;">
+    <div id="modalInnerEndEvent">
+        <p>The event is over now. A report of the event has been generated in the form of an Excel sheet.</p>
+        <button id="check-report-btn">Check Report</button>
+    </div>
+</div>
 {% endblock %}
 {% block footer %}
 {{ block.super }}

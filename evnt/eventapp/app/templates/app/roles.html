@@ -27,7 +27,14 @@
     <option id="o4" value="4">Edit Event</option>
     {% endif %}
 </select>
-
+<div id="timer-start" data-value="{{ timer_start }}"></div>
+<div id="timer-duration" data-value="{{ duration }}"></div>
+<div id="modalOuterEndEvent" style="display: none;">
+    <div id="modalInnerEndEvent">
+        <p>The event is over now. A report of the event has been generated in the form of an Excel sheet.</p>
+        <button id="check-report-btn">Check Report</button>
+    </div>
+</div>
 <button id="assign-btn">Assign</button>
 <p id="for-button"></p>
 
