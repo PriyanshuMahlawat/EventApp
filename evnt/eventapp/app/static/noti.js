@@ -52,31 +52,28 @@ document.addEventListener("DOMContentLoaded", function () {
 
             acceptBtn.appendChild(acceptIcon);
             rejectBtn.appendChild(rejectIcon);
-
-            let total_seconds = Arr[i].create_time;
+            const createTime = new Date(Arr[i].create_time);
+            timeago = Date.now()-createTime;
+            const secondsAgo = Math.floor(timeago / 1000);
+            const minutesAgo = Math.floor(timeago / (1000 * 60));
+            const hoursAgo = Math.floor(timeago / (1000 * 60 * 60));
+            const daysAgo = Math.floor(timeago / (1000 * 60 * 60 * 24));
+            var realTimeago = `${secondsAgo} seconds ago`;
+            if(minutesAgo && !hoursAgo && !daysAgo){
+                realTimeago = `${minutesAgo} minutes ago`;
+            }
+            else if(hoursAgo && !daysAgo){
+                realTimeago = `${hoursAgo} hours ago`;
+            }
+            else if(daysAgo){
+                realTimeago = `${daysAgo} days ago`;
+            }
             
-            let days = Math.ceil(total_seconds / 24 / 60 / 60);
-            let hours = Math.ceil(total_seconds / 60 / 60) - days * 24;
-            let minutes = Math.ceil(total_seconds / 60) - days * 24 - hours * 60;
-            let seconds = total_seconds % 60;
-            let timeago = "";
-            if (days != 0) {
-                timeago = days + " days " + hours + " hours";
-            }
-            if (days == 0 && hours != 0) {
-                timeago = hours + " hours " + minutes + " minutes";
-            }
-            if (days == 0 && hours == 0 && minutes != 0) {
-                timeago = minutes + " minutes " + seconds + " seconds";
-            }
-            if (days == 0 && hours == 0 && minutes == 0 && seconds != 0) {
-                timeago = seconds + " seconds";
-            }
 
             let notidellink = `http://localhost:8000/api/notidel/${id}/`;
 
             paraEl.textContent = `${Arr[i].name} has requested to join your Event.`;
-            paraEl2.textContent = `${timeago} ago`;
+            paraEl2.textContent = `${realTimeago}`;
             linkdel.href = notidellink;
             linkdel2.href = notidellink;
 

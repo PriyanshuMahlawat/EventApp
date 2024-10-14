@@ -1,55 +1,77 @@
-/* General styling for the page */
 body {
-    background-color: #f5f5f5;
     font-family: 'Arial', sans-serif;
-    color: #333;
-    padding: 20px;
+   
 }
 
-/* Styling for the page title */
 p {
-    font-size: 24px;
+    font-size: 1.5em;
     font-weight: bold;
-    margin-bottom: 20px;
+    color: #333;
+    margin-bottom: 10px;
 }
 
-/* List styling */
 ul {
     list-style-type: none;
     padding: 0;
-    margin: 0 auto;
-    max-width: 600px;
+    margin: 0;
 }
 
-/* List item styling */
 li {
     padding: 15px;
-    margin-bottom: 15px;
+    margin: 10px 0;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Paragraph inside list items */
-li p {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 500;
-    color: #444;
+li:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
-/* Link styling */
-a {
+.event-name {
+    font-size: 1.4em;
+    font-weight: bold;
+    color: #f39c12; /* Orange for event name */
+    background-color: #fef5e7; /* Light orange background */
+    padding: 8px;
+    border-radius: 5px;
+    display: inline-block;
+    margin-bottom: 5px;
+    transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+.event-name:hover {
+    color: #e67e22; /* Darker orange on hover */
+    background-color: #fdf2e3;
+}
+
+li .event-report {
+    font-size: 1em;
+    color: #3498db; /* Blue for the Excel sheet link */
     text-decoration: none;
-    color: #4CAF50;
-    font-size: 16px;
-    margin-left: 10px;
+    display: block;
+    margin-top: 5px;
+    font-weight: normal;
+    transition: color 0.3s ease;
 }
 
-/* Hover effect for links */
-a:hover {
-    text-decoration: underline;
+li .event-report:hover {
+    color: #2980b9; /* Darker blue on hover */
+}
+
+#hosted-list, #joined-list {
+    margin-bottom: 30px;
+}
+
+.empty-message {
+    color: #888;
+    font-size: 1.1em;
+    padding: 10px;
+    text-align: center;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    background-color: #fafafa;
+    margin-top: 20px;
 }

@@ -7,7 +7,15 @@
 <p>Suggested Lineup!</p>
 <p>Note: 1.You can edit this Table.</p><br>
 <p>2.Finalise 'only' when you don't want any changes.</p>
-<table id="table"></table>
+<h1>Event Slots Table</h1>
+<table>
+    <thead>
+        <tr id="headerRow"></tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+</table>
+
+
 <div id="modalOuterEndEvent" style="display: none;">
     <div id="modalInnerEndEvent">
         <p>The event is over now. A report of the event has been generated in the form of an Excel sheet.</p>
@@ -16,5 +24,8 @@
 </div>
 <div id="timer-start" data-value="{{ timer_start }}"></div>
 <div id="timer-duration" data-value="{{ duration }}"></div>
+
+<button id="finalise-btn">Finalise</button><br>
+<button id="share-table" style="display: none;">Share to everyone!</button>
 <script src="{% static 'suggested.js' %}"></script>
 {% endblock %}

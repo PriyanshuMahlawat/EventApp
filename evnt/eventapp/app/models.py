@@ -23,7 +23,7 @@ class Event(models.Model):
 class Notifications(models.Model):
     Event = models.ForeignKey(Event,on_delete=models.DO_NOTHING)
     name = models.CharField(max_length=50)
-    create_time = models.CharField(max_length=250)
+    create_time = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.name
@@ -52,3 +52,18 @@ class completedEvents(models.Model):
 class RealTable(models.Model):
     event_id = models.IntegerField(unique=True)
     table = models.JSONField()
+
+
+class FinalSlotsTable(models.Model):
+    Event = models.OneToOneField(Event, on_delete=models.CASCADE)
+    excel_file = models.FileField(upload_to='finaltable/', blank=True, null=True)
+
+    
+    
+    @property
+    def download_url(self):
+        if self.excel_file:
+            return self.excel_file.url
+        return None
+
+    

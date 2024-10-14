@@ -9,6 +9,9 @@
 <p id="host-name">By: </p>
 
 <div class="button-container">
+    {% if member %}
+    <th><a href="{% url 'slotnoti' %}"><button>Assigned Slots</button></a></th>
+    {% endif %}
     {% if 1v %}
     <th><a href="{% url 'notipg' %}"><button>Requests</button></a></th>
     {% endif %}

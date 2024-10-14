@@ -2,7 +2,9 @@ from django.urls import path
 from . import views
 
 
+
 urlpatterns = [
+    
     path("",views.index,name="index"),
     path("host/",views.hostpg,name="host"),
     path("popup/",views.popup_view,name="popup"),
@@ -17,6 +19,7 @@ urlpatterns = [
     path("manageEvent/",views.manage,name="manageEvent"),
     path("manageEvent/editEvent/",views.editEvent,name="editEvent"),
     path("suggested/",views.suggestpage,name="suggested"),
+    path("slotnoti/",views.slotnoti,name="slotnoti"),
     path('api/slots/<int:Event_id>/',views.SlotsDetailAPIView.as_view(),name='slotsapi'),
     path("api/eventlist/",views.EventSerializerAPIView.as_view(),name="eventlistapi"),
     path("api/<int:pk>/",views.EventDetailSerializerAPIView.as_view(),name="detailapi"),
@@ -34,6 +37,7 @@ urlpatterns = [
     path("api/tableslots/<int:pk>/",views.tableSlotAPIView.as_view(),name="tableSlots"),
     path("api/excelSheets/<int:event_id>/",views.CompletedEventsSerializerView.as_view(),name="excel"),
     path('api/currenttable/<int:event_id>/',views.TableView.as_view(), name='table-view'),
-    path("api/completed/<int:boolean>/<str:username>/",views.CompletedEventGetAPIView.as_view(),name="completedEvents"),
+    path("api/completed/get/",views.CompletedEventGetAPIView.as_view(),name="completedEvents"),
     path("api/realTable/<str:username>/<int:event_id>/",views.RealTableView.as_view(),name="realTableAPI"),
+    path("api/finaltable/<int:pk>/",views.FinalTableAPIView.as_view(),name="finalTable"),
 ]

@@ -1,4 +1,5 @@
 {% load static %}
+{% load socialaccount %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -36,7 +37,7 @@
             <div id="modal-outer">
                 <div id="modal-inside">
                     {% if not logged_in %}
-                    <a style="text-decoration: none;" href="http://localhost:8000/accounts/google/login/?process=login"><button
+                    <a style="text-decoration: none;" href="{% provider_login_url 'google' %}"><button
                             class="modal-btn">Login!</button></a>
                     {% else %}
                     <a style="text-decoration: none;"

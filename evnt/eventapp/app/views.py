@@ -1,6 +1,10 @@
 from django.shortcuts import render
 import requests
+import os
+from django.conf import settings
+from django.shortcuts import get_object_or_404
 import openpyxl
+import pandas as pd
 from django.utils import timezone
 from django.core.files.base import ContentFile
 import io
@@ -12,16 +16,18 @@ from django.contrib.auth.models import User
 from rest_framework.permissions import IsAuthenticated
 from django.views.decorators.csrf import csrf_exempt
 import json
+from django.urls import reverse
 from .forms import EventForm
-from .models import Event,Notifications,CurrentEvent,slots,completedEvents,RealTable
+from .models import Event,Notifications,CurrentEvent,slots,completedEvents,RealTable,FinalSlotsTable
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_protect
 from allauth.socialaccount.models import SocialAccount
 from django.db import IntegrityError
+
 from rest_framework import generics
 from rest_framework.views import APIView
-from django.contrib.auth.models import Group
+
 from django.db import IntegrityError
 from rest_framework.response import Response
 from .serializers import (
@@ -39,28 +45,41 @@ from .serializers import (
     CompletedEventsSerializer,
     CurrentTableSerializer,
     RealTableSerializer,
+    CompletedEventGetSerializer,
+    FinalSlotsSerializer,
 )
 
 
 
 
+
+
+
 def completedpage(request):
-    event_id = request.COOKIES.get('event_id')
-    host = False
-    member = False
-    if request.user.is_authenticated:
-        username = request.user.username
-        e = Event.objects.get(id=event_id)
-        hostname = e.host.username
-        members = e.members
-        if username == hostname:
-            host = True
-        elif(username in members):
-            member = True
+    if 'event_id' in request.COOKIES:
+        event_id = request.COOKIES.get('event_id')
     else:
-        username = None 
-    Event.objects.filter(id=event_id).delete()   
-    return render(request,"app/completed.html",{"username":username,"host":host,"member":member})
+        event_id = -1
+    
+    user= request.user
+    if user.is_authenticated:
+        username = user.username
+
+    
+    if Event.objects.filter(id=event_id).exists():
+        Event.objects.filter(id=event_id).delete()  
+
+    logged_in = False
+    image_url = None
+    if request.user.is_authenticated:
+        logged_in =True
+        
+       
+        social_account = SocialAccount.objects.get(user=request.user)
+        data = social_account.extra_data
+        image_url = data.get('picture') 
+    return render(request,"app/completed.html",{"username":username,"logged_in":logged_in,"image_url":image_url})
+
 
 def suggestpage(request):
     context= {}
@@ -73,7 +92,19 @@ def suggestpage(request):
     timeStart = timer_start.isoformat()
     context["timer_start"] = timeStart
     context['duration']= duration
-    return render(request,"app/suggested.html")
+
+    logged_in = False
+    image_url = None
+    if request.user.is_authenticated:
+        logged_in =True
+        
+       
+        social_account = SocialAccount.objects.get(user=request.user)
+        data = social_account.extra_data
+        image_url = data.get('picture')
+    context["logged_in"]=logged_in
+    context["image_url"]=image_url
+    return render(request,"app/suggested.html",context)
 
 def create_slots():
     
@@ -216,11 +247,18 @@ def noti(request):
         social_account = SocialAccount.objects.get(user=request.user)
         data = social_account.extra_data
         image_url = data.get('picture')
+
     person = request.user.username
+    host = False
+    event_id = request.COOKIES.get('event_id')
+    
+    if(request.user.username == Event.objects.get(id = event_id).host.username):
+        host = True
     context['image_url'] = image_url
     context['person'] = person
+    context['host'] = host
     context['logged_in'] = logged_in
-    return render(request,"app/notifications.html",)
+    return render(request,"app/notifications.html",context)
 
 def slotspg(request):
     context = {}
@@ -251,6 +289,10 @@ def slotspg(request):
     context['host'] = host
     context['logged_in'] = logged_in
     return render(request,"app/slots.html",context)
+
+
+
+
 
 
 
@@ -285,6 +327,7 @@ def roles(request):
 def manage(request):
     logged_in = False
     image_url = None
+    member = False
     if request.user.is_authenticated:
         logged_in =True
         
@@ -298,7 +341,8 @@ def manage(request):
     
 
     try:
-        
+        if request.user.username in event.members.split(','):
+            member = True
         if request.user.username == event.host.username:
             host = True
     except Event.DoesNotExist:
@@ -308,6 +352,7 @@ def manage(request):
     person = request.user.username
     
     context = {
+        "member":member,
         "person": person,
         "live": False,
         "1v": False,
@@ -357,6 +402,36 @@ def manage(request):
     
 
     return render(request, "app/manage.html", context)
+
+
+@login_required
+def slotnoti(request):
+    context ={}
+    event_id = request.COOKIES.get('event_id')
+    finalmodel = get_object_or_404(FinalSlotsTable, Event__id=event_id)
+    event = get_object_or_404(Event,id=event_id)
+    link = finalmodel.download_url
+    context["link"] = link
+    timezone = pytz.timezone('Asia/Kolkata')
+    timer_start = event.event_time
+    duration = str(event.event_duration.total_seconds())
+    timer_start = timer_start.astimezone(timezone)
+    timeStart = timer_start.isoformat()
+    context["timer_start"] = timeStart
+    context['duration']= duration
+
+    logged_in = False
+    image_url = None
+    if request.user.is_authenticated:
+        logged_in =True
+        
+       
+        social_account = SocialAccount.objects.get(user=request.user)
+        data = social_account.extra_data
+        image_url = data.get('picture')
+    context["logged_in"]=logged_in
+    context["image_url"]=image_url
+    return render(request,"app/slotnoti.html",context)
 
 
 
@@ -475,6 +550,9 @@ class NotiSerializerAPIView(generics.ListCreateAPIView):
     queryset = Notifications.objects.all()
     serializer_class = NotiSerializer
 
+    
+
+
 class NotiDestroyUpdateView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Notifications.objects.all()
     serializer_class = NotiSerializer 
@@ -591,17 +669,79 @@ class CurrentEventAPIView(APIView):
     
 
 
-class tableSlotAPIView(generics.RetrieveDestroyAPIView):
-    queryset = Event.objects.all()
-    serializer_class = tableSlotSerializer
+class tableSlotAPIView(APIView):
 
-    def get_serializer_context(self):
-        context= super().get_serializer_context()
-        context.update({
-            'request': self.request,
-            'id':self.kwargs.get('pk')
-        })
-        return context
+    def get(self,request,**kwargs):
+        event_id = kwargs.get('pk')
+        event = Event.objects.get_or_create(id =event_id)
+        serializer = tableSlotSerializer(event,context={'id':event_id})
+        return Response(serializer.data)
+
+   
+class FinalTableAPIView(generics.CreateAPIView):
+    queryset = FinalSlotsTable.objects.all()
+    serializer_class = FinalSlotsSerializer
+
+    def create(self, request, *args, **kwargs):
+        event_id = kwargs.get('pk')
+        endpoint = f"http://localhost:8000/api/tableslots/{event_id}"
+        response = requests.get(endpoint)
+        if response.status_code ==200:
+            data = response.json()
+            print("fetched data:",data)
+        else:
+            print(f"error:{response.status_code}")
+        
+
+        event = Event.objects.get(id=event_id)
+        Ename = event.Event_name
+
+
+        rows = []
+        for room_id,slots in data['slot'].items():
+            for slot in slots:
+                user = list(slot.keys())[0]
+                times = slot[user]
+                rows.append({
+                    "Room":room_id,
+                    'Name': user if user!= 'null' else 'Empty',
+                    'Start Time': times[0],
+                    'End Time': times[1],
+                })
+            rows.append({
+            "Room": '',  # or None
+            'Name': '',
+            'Start Time': '',
+            'End Time': ''
+            })
+            rows.append({
+            "Room": '',  # or None
+            'Name': '',
+            'Start Time': '',
+            'End Time': ''
+            })
+        
+        df = pd.DataFrame(rows)
+        excel_file_name = f"{Ename}_eventSlots.xlsx"
+        excel_file_path = os.path.join(settings.MEDIA_ROOT, 'finaltable', excel_file_name)
+        df.to_excel(excel_file_path, index=False)
+
+        
+        model, created = FinalSlotsTable.objects.get_or_create(Event=event)
+        model.excel_file = f"finaltable/{excel_file_name}"
+        model.save()
+
+        
+        serializer = self.get_serializer(model)
+        return Response(serializer.data)    
+
+        
+
+
+        
+        
+
+
 
 class CompletedEventsSerializerView(generics.CreateAPIView):
     queryset = completedEvents.objects.all()
@@ -665,32 +805,38 @@ class CompletedEventsSerializerView(generics.CreateAPIView):
 
 
 
-class CompletedEventGetAPIView(generics.RetrieveAPIView):
-    queryset = completedEvents.objects.all()
-    serializer_class = CompletedEventsSerializer
-
-    def get(self,request,*args,**kwargs):
+class CompletedEventGetAPIView(APIView):
+    def get(self, request, *args, **kwargs):
+        response_data = {
+            'hosted': [],
+            'joined': [],
+        }
         
-        boolean = kwargs.get('boolean')
-        username = kwargs.get('username')
-        if boolean ==1:
-            ##1 is hosted
-            queryset = completedEvents.objects.filter(host=username)
-                
-            
-        if boolean ==0:
-            ##0 for joined
-            queryset = completedEvents.objects.filter(members__icontains=username)
-            
-        else:
-            queryset = completedEvents.objects.none()
-
-        for event in queryset:
-            if event.excel:
-                return FileResponse(event.excel, as_attachment=True, filename=f'Event_Records-{event.event_id}.xlsx')
+        username = request.user.username
         
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        
+        for event in completedEvents.objects.all():
+            
+            if username == event.host and event.excel:
+                record = {
+                    'Event_name': event.Event_name,
+                    'excel_link': event.excel.url  
+                }
+                response_data['hosted'].append(record)
+
+            
+            if username in event.members.split(',') and event.excel:
+                record = {
+                    'Event_name': event.Event_name,
+                    'excel_link': event.excel.url  
+                }
+                response_data['joined'].append(record)
+        print(f"data{response_data}")
+        return Response(response_data)
+
+            
+        
+        
             
     
 class TableView(APIView):
@@ -719,7 +865,7 @@ class RealTableView(generics.CreateAPIView):
         event_id = kwargs.get('event_id')
         username = kwargs.get('username')
         data = request.data
-        print(f"Data for Real Table: {data}")
+        
 
         try:
             instance = RealTable.objects.get(event_id=event_id)

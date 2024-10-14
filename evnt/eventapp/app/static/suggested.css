@@ -1,3 +1,117 @@
+/* Basic reset and body styling */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
+    
+    line-height: 1.6;
+}
+
+/* Table styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden; /* Prevent border-radius from being cut off */
+}
+
+th, td {
+    border: 1px solid #ccc;
+    padding: 15px;
+    text-align: left;
+    transition: background-color 0.3s;
+}
+
+th {
+    background-color: #007bff;
+    color: white;
+    font-weight: bold;
+}
+
+td {
+    background-color: #ffffff;
+}
+
+/* Alternating row colors */
+tr:nth-child(even) td {
+    background-color: #f9f9f9;
+}
+
+/* Hover effect for table rows */
+tr:hover td {
+    background-color: #f1f1f1;
+}
+
+/* Strong tag styling for time slots */
+strong {
+    display: block; /* Display time slots on separate lines */
+    color: #007bff; /* Color for the time slots */
+    margin-bottom: 5px;
+}
+
+/* Empty cell styling */
+td.empty {
+    color: #888; /* Grey color for empty slots */
+    font-style: italic; /* Italic for empty slots */
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    table {
+        font-size: 14px; /* Smaller font for mobile devices */
+    }
+    
+    th, td {
+        padding: 10px; /* Less padding for mobile */
+    }
+    button {
+        font-size: 12px; /* Smaller font size on small screens */
+        padding: 8px 12px; /* Adjust padding for smaller screens */
+    }
+}
+/* Button Styles */
+button {
+    background-color: #007bff; /* Bootstrap primary color */
+    color: white;              /* White text color */
+    border: none;              /* Remove default border */
+    border-radius: 5px;       /* Rounded corners */
+    padding: 10px 15px;       /* Padding for better touch area */
+    font-size: 14px;          /* Font size */
+    cursor: pointer;           /* Pointer cursor on hover */
+    transition: background-color 0.3s ease; /* Smooth background color transition */
+}
+
+/* Button Hover Effect */
+button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+/* Button Active Effect */
+button:active {
+    background-color: #004085; /* Even darker blue when clicked */
+    transform: translateY(1px); /* Slightly moves the button down when pressed */
+}
+
+/* Optional: Button Focus Styles */
+button:focus {
+    outline: none; /* Remove default focus outline */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Add a subtle shadow for focus */
+}
+
+/* Responsive Design for Small Screens */
+
+
+
+
+
 #modalOuterEndEvent {
     display: none;
     position: fixed;

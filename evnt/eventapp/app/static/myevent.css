@@ -75,3 +75,14 @@ a {
 a button {
     margin-left: 10px;
 }
+/* Style for no events message */
+.no-events {
+    font-size: 18px;
+    font-style: italic;
+    color: #888;
+    text-align: center;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    margin-top: 10px;
+}

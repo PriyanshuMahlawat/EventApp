@@ -1,0 +1,23 @@
+{% extends "app/base.html" %}
+{% load static %}
+{% block title %}Notifications{% endblock %}
+
+{% block body_block %}
+<p>Here is your Slot table link. Check out your slots and be present in thee respected room
+     and make sure to put up your attendance usi8ng th admin</p>
+<a href="{{ link }}">Check your slot!</a>
+
+<div id="timer-start" data-value="{{ timer_start }}"></div>
+<div id="timer-duration" data-value="{{ duration }}"></div>
+
+<div id="modalOuterEndEvent" style="display: none;">
+    <div id="modalInnerEndEvent">
+        <p>The event is over now. A report of the event has been generated in the form of an Excel sheet.</p>
+        <button id="check-report-btn">Check Report</button>
+    </div>
+</div>
+<script src="{% static 'slotnoti.js' %}"></script>
+{% endblock %}
+{% block footer %}
+{{ block.super }}
+{% endblock %}

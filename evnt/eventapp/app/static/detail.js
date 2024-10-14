@@ -25,11 +25,17 @@ document.addEventListener("DOMContentLoaded", async function() {
         fetch(`http://localhost:8000/api/${id}/`)
         .then(response => response.json())
         .then(data => {
+            console.log(data);
             eventName.textContent = data.Event_name;
             hostName.textContent = data.host_name;
             eventTime.textContent = new Date(data.event_time).toLocaleString();
             rooms.textContent = data.roomArr.join(", ");
-            detail.textContent = data.Detail;
+            if(data.Detail != null){
+                detail.textContent = data.Detail;
+            }
+            else{
+                detail.textContent = "No detail provided.😒";
+            }
             createTime.textContent = new Date(data.create_time).toLocaleString();
             eventThumbnail.src = data.Event_Thumbnail;
         })

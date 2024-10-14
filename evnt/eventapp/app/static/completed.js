@@ -1,91 +1,43 @@
 document.addEventListener("DOMContentLoaded", function() {
-    const hostedlistEl = document.getElementById("hosted-list");
-    const joinedlistEl = document.getElementById("joined-list");
-    const username= document.getElementById("username").textContent;
-    const check = document.getElementById("check").textContent;
+    const username = document.getElementById("username").textContent.trim();
     
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
+    // API URL
+    const apiUrl = "http://localhost:8000/api/completed/get/";
+
+    // Fetch data from the API
+    fetch(apiUrl, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json"
         }
-        return cookieValue;
-    }
+    })
+    .then(response => response.json())
+    .then(data => {
+        renderEventList(data.hosted, 'hosted-list', "Hosted");
+        renderEventList(data.joined, 'joined-list', "Joined");
+    })
+    .catch(error => {
+        console.error("Error fetching the event data:", error);
+    });
 
-    const csrftoken = getCookie('csrftoken');
+    // Function to render event lists
+    function renderEventList(events, elementId, title) {
+        const listElement = document.getElementById(elementId);
 
-    if(check == 1){
-        fetch(`http://localhost:8000/api/completed/1/${username}/`) 
-        .then(response => response.json())
-        .then(data => {
-            addToHost(data);
-            console.log("hosted report")
-        })
-        .catch(error => {
-            console.error("Error:", error);
+        if (events.length === 0) {
+            const emptyMessage = document.createElement('li');
+            emptyMessage.textContent = `No ${title} events found.`;
+            listElement.appendChild(emptyMessage);
+            return;
+        }
+
+        events.forEach(event => {
+            const listItem = document.createElement('li');
+            const eventLink = document.createElement('a');
+            eventLink.href = event.excel_link;
+            eventLink.textContent = `${event.Event_name} - Event Report`;
+            listItem.appendChild(eventLink);
+            listElement.appendChild(listItem);
         });
-    }
-
-    function addToHost(data) {
-        if (data.length === 1 && data[0].excel === null) {
-            hostedlistEl.innerHTML = `<li>No Events Completed.</li>`;
-        } else {
-            for (let i = 0; i < data.length; i++) {
-                let listEl = document.createElement("li");
-                let paraEl = document.createElement("p");
-                let downloadLink = document.createElement("a");
-                
-                paraEl.textContent = data[i].Event_name;
-                
-                downloadLink.href = `http://localhost:8000/media/excelSheets/${data[i].excel}`;
-                downloadLink.download = data[i].excel;
-                downloadLink.textContent = "Download Report";
-
-                listEl.appendChild(paraEl);
-                listEl.appendChild(downloadLink);
-                hostedlistEl.appendChild(listEl);
-            }
-        }
-    }
-
-    if(check ==0){
-        fetch(`http://localhost:8000/api/completed/0/${username}/`)
-        .then(response => response.json())
-        .then(data => {
-            console.log("joined report")
-            addToJoined(data);
-        })
-        .catch(error => {
-            console.error("Error:", error);
-        });
-    }
-
-    function addToJoined(data) {
-        if (data.length === 1 && data[0].excel === null) {
-            joinedlistEl.innerHTML = `<li>No Events Participated.</li>`;
-        } else {
-            for (let i = 0; i < data.length; i++) {
-                let listEl = document.createElement("li");
-                let paraEl = document.createElement("p");
-                let downloadLink = document.createElement("a");
-
-                paraEl.textContent = data[i].Event_name;
-
-                downloadLink.href = `http://localhost:8000/media/excelSheets/${data[i].excel}`;
-                downloadLink.download = data[i].excel;
-                downloadLink.textContent = "Download Report";
-
-                listEl.appendChild(paraEl);
-                listEl.appendChild(downloadLink);
-                joinedlistEl.appendChild(listEl);
-            }
-        }
     }
 });
