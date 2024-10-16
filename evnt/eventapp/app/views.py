@@ -18,7 +18,7 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 from django.urls import reverse
 from .forms import EventForm
-from .models import Event,Notifications,CurrentEvent,slots,completedEvents,RealTable,FinalSlotsTable
+from .models import Event,Notifications,CurrentEvent,slots,completedEvents,RealTable,FinalSlotsTable,tablemodifications
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_protect
@@ -47,6 +47,7 @@ from .serializers import (
     RealTableSerializer,
     CompletedEventGetSerializer,
     FinalSlotsSerializer,
+    tablemodificationsSerializer
 )
 
 
@@ -341,8 +342,9 @@ def manage(request):
     
 
     try:
-        if request.user.username in event.members.split(','):
-            member = True
+        if event.members:
+            if request.user.username in event.members.split(','):
+                member = True
         if request.user.username == event.host.username:
             host = True
     except Event.DoesNotExist:
@@ -408,10 +410,18 @@ def manage(request):
 def slotnoti(request):
     context ={}
     event_id = request.COOKIES.get('event_id')
-    finalmodel = get_object_or_404(FinalSlotsTable, Event__id=event_id)
+    
+    try:
+            finalmodel = FinalSlotsTable.objects.get(Event__id=event_id)
+            link = finalmodel.download_url
+            context['link'] = link
+    except:
+        context['link']=None
+
+
     event = get_object_or_404(Event,id=event_id)
-    link = finalmodel.download_url
-    context["link"] = link
+    
+    
     timezone = pytz.timezone('Asia/Kolkata')
     timer_start = event.event_time
     duration = str(event.event_duration.total_seconds())
@@ -677,14 +687,231 @@ class tableSlotAPIView(APIView):
         serializer = tableSlotSerializer(event,context={'id':event_id})
         return Response(serializer.data)
 
-   
+
+class TableModificationsAPIView(APIView):
+
+    def get(self,request,**kwargs):
+        event_id = kwargs.get('pk')
+        model = tablemodifications.objects.get(Event__id = event_id)
+        serializer = tablemodificationsSerializer(model)
+
+        return Response(serializer.data['table'])
+    
+
+    def check(self, table, roomNew,count):
+        
+        Notacceptable = False
+        room_slots = table['slot'].get(roomNew, [])
+        if count==0:
+            
+            return True
+        
+        # If there are no slots or only one slot, there's no possibility of overlap
+        if len(room_slots) <= 1:
+            return Notacceptable
+
+        i = 0
+        while i < len(room_slots) - 1:  # Loop until the second-last slot to avoid out-of-range error
+            current_slot = room_slots[i]
+            next_slot = room_slots[i + 1]
+            
+            current_end = list(current_slot.values())[0][1]
+            next_start = list(next_slot.values())[0][0]
+
+            # Debugging: Print the current end and next start times
+            print(f"Comparing: Current End = {current_end}, Next Start = {next_start}")
+            
+            if not (current_end <= next_start):
+                Notacceptable = True
+                print(f"Slots overlap! End: {current_end}, Start: {next_start}")
+                break
+            i += 1
+        
+        return Notacceptable
+
+
+    def patch(self,request,**kwargs):
+        event_id = kwargs.get('pk')
+        
+        changes = request.data.get('changes')
+        modeltable = tablemodifications.objects.get(Event__id=event_id)
+        Arr = changes
+        nameString = Arr[0]
+        name = Arr[1]
+        roomIni= Arr[2] 
+        roomNew = Arr[3]
+        startTime = Arr[4] +":00"
+        endTime = Arr[5]+":00"
+        opTable = modeltable.table 
+        _count = nameString.count('_')
+        if _count ==0:
+            new_name= 'null'
+        else:
+            new_name = nameString.replace(f"_{name}", "")
+        roomsdictIni = opTable['slot'][roomIni] 
+
+        
+        
+        
+        found = False 
+        
+       
+        for slot in roomsdictIni:
+            if nameString in slot:
+                slot_times = slot[nameString]
+                
+                if slot_times == [startTime, endTime]:
+                    found = True
+
+                    slot[new_name] = slot.pop(nameString) 
+                    
+                    break
+        
+        if not found:
+            print(f"{nameString} with time slot {startTime} - {endTime} not found in any slot.")
+    
+    
+        opTable['slot'][roomIni] = roomsdictIni
+       
+            
+        room_slots = opTable['slot'][roomNew]
+        print(f'room_slots{room_slots}')
+        print(len(room_slots))
+        i = 0
+        inserted = False
+        count=0
+        while self.check(opTable, roomNew, count):
+            count += 1
+            while i < len(room_slots):
+                print('went in')
+                current_slot = room_slots[i]
+                current_start_time, current_end_time = list(current_slot.values())[0]
+                current_username = list(current_slot.keys())[0]
+                
+                # Avoid adding 'null' to a real username
+                new_name = current_username
+                if current_username != 'null' and name != 'null':
+                    new_name = f"{current_username}_{name}"
+                elif name != 'null':
+                    new_name = name  # Assign the name directly if it's not null
+            
+                if (startTime) == (current_start_time) and (endTime) < (current_end_time):
+                    print("check1")
+                    room_slots[i] = {new_name: (startTime, endTime)}
+                    room_slots.insert(i + 1, {current_username: (endTime, current_end_time)})
+                    inserted = True
+                    break
+
+                elif (startTime) == (current_start_time) and (endTime) > (current_end_time):
+                    print("check2")
+                    room_slots[i] = {new_name: (current_start_time, current_end_time)}
+                    room_slots.insert(i + 1, {f"{name}": (current_end_time, endTime)})
+                    inserted = True
+                    break
+
+                elif (startTime) == (current_start_time) and (endTime) == (current_end_time):
+                    print("check3")
+                    room_slots[i] = {new_name: (startTime, endTime)}
+                    inserted = True
+                    break
+
+                elif (startTime) > (current_start_time) and (startTime) < (current_end_time):
+                    if (endTime) < (current_end_time):
+                        print("check4")
+                        room_slots[i] = {current_username: (current_start_time, startTime)}
+                        room_slots.insert(i + 1, {new_name: (startTime, endTime)})
+                        room_slots.insert(i + 2, {current_username: (endTime, current_end_time)})
+                        inserted = True
+                        break
+
+                    elif (endTime) == (current_end_time):
+                        print("check5")
+                        room_slots[i] = {current_username: (current_start_time, startTime)}
+                        room_slots.insert(i + 1, {new_name: (startTime, endTime)})
+                        inserted = True
+                        break
+
+                    elif (endTime) > (current_end_time):
+                        print("check6")
+                        room_slots[i] = {current_username: (current_start_time, startTime)}
+                        room_slots.insert(i + 1, {new_name: (startTime, current_end_time)})
+                        room_slots.insert(i + 2, {name: (current_end_time, endTime)})
+                        inserted = True
+                        break
+
+                elif (startTime) < (current_start_time) and (endTime) < (current_end_time):
+                    print("check7")
+                    room_slots[i] = {name: (startTime, current_start_time)}
+                    room_slots.insert(i + 1, {new_name: (current_start_time, endTime)})
+                    room_slots.insert(i + 2, {current_username: (endTime, current_end_time)})
+                    inserted = True
+                    break
+
+                elif (startTime) < (current_start_time) and (endTime) > (current_end_time):
+                    print("check8")
+                    room_slots[i] = {name: (startTime, current_start_time)}
+                    room_slots.insert(i + 1, {new_name: (current_start_time, current_end_time)})
+                    room_slots.insert(i + 2, {name: (current_end_time, endTime)})
+                    inserted = True
+                    break
+
+                elif (startTime) < (current_start_time) and (endTime) == (current_end_time):
+                    print("check9")
+                    room_slots[i] = {name: (startTime, current_start_time)}
+                    room_slots.insert(i + 1, {new_name: (current_start_time, current_end_time)})
+                    inserted = True
+                    break
+
+                i += 1
+
+            # Case 3: If not inserted yet, append to the end of the list (no overlap and last slot)
+            if not inserted:
+                room_slots.append({name: (startTime, endTime)})
+
+            # Step 3: Update the table with the modified room_slots
+            opTable['slot'][roomNew] = room_slots
+
+        print(opTable)
+        serializer = tablemodificationsSerializer(modeltable, data={'table': opTable}, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+        return Response(serializer.data)
+
+
+    
+    
+
+
+    def post(self,request,**kwargs):
+        
+        event_id  =kwargs.get('pk')
+        try:
+            event = Event.objects.get(id = event_id)
+        except:
+            return Response({"error":"Event not found"})
+        
+        try:
+       
+            table_modification = tablemodifications.objects.get(Event=event)
+            serializer = tablemodificationsSerializer(table_modification, data=request.data)  
+        except tablemodifications.DoesNotExist:
+        
+            serializer = tablemodificationsSerializer(data=request.data)
+            
+        if serializer.is_valid():
+            serializer.save(Event=event)
+            return Response(serializer.data)
+        return Response(serializer.errors)
+
+
+  
 class FinalTableAPIView(generics.CreateAPIView):
     queryset = FinalSlotsTable.objects.all()
     serializer_class = FinalSlotsSerializer
 
     def create(self, request, *args, **kwargs):
         event_id = kwargs.get('pk')
-        endpoint = f"http://localhost:8000/api/tableslots/{event_id}"
+        endpoint = f"http://localhost:8000/api/tablemodify/{event_id}/"
         response = requests.get(endpoint)
         if response.status_code ==200:
             data = response.json()

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Event,Notifications,CurrentEvent,slots,completedEvents,RealTable,FinalSlotsTable
+from .models import Event,Notifications,CurrentEvent,slots,completedEvents,RealTable,FinalSlotsTable,tablemodifications
 from django.contrib.auth.models import Group, User, Permission
 from django.contrib.contenttypes.models import ContentType
 from datetime import datetime
@@ -222,6 +222,11 @@ class CompletedEventsSerializer(serializers.ModelSerializer):
         fields = ['excel','event_id','Event_name']
 
         
+class tablemodificationsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = tablemodifications
+        fields =['table','changes']
+
 
 
 class FinalSlotsSerializer(serializers.ModelSerializer):

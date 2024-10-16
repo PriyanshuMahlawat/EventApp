@@ -40,4 +40,5 @@ urlpatterns = [
     path("api/completed/get/",views.CompletedEventGetAPIView.as_view(),name="completedEvents"),
     path("api/realTable/<str:username>/<int:event_id>/",views.RealTableView.as_view(),name="realTableAPI"),
     path("api/finaltable/<int:pk>/",views.FinalTableAPIView.as_view(),name="finalTable"),
+    path("api/tablemodify/<int:pk>/",views.TableModificationsAPIView.as_view(),name="modifyTable"),
 ]

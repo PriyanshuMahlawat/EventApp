@@ -3,9 +3,13 @@
 {% block title %}Notifications{% endblock %}
 
 {% block body_block %}
+{% if link %}
 <p>Here is your Slot table link. Check out your slots and be present in thee respected room
-     and make sure to put up your attendance usi8ng th admin</p>
+    and make sure to put up your attendance usi8ng th admin</p>
 <a href="{{ link }}">Check your slot!</a>
+{% else %}
+<p>The host hasn't finalised the Slots yet once it gets finalised and shared with you , you'll be able to see it here.</p>
+{% endif %}
 
 <div id="timer-start" data-value="{{ timer_start }}"></div>
 <div id="timer-duration" data-value="{{ duration }}"></div>

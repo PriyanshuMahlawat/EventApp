@@ -66,4 +66,8 @@ class FinalSlotsTable(models.Model):
             return self.excel_file.url
         return None
 
-    
+
+class tablemodifications(models.Model):
+    Event = models.OneToOneField(Event,on_delete=models.CASCADE)
+    table= models.JSONField()
+    changes = models.CharField(max_length=800,null=True)
