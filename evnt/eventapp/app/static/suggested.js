@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", async function () {
     let Event_id;
     const FinaliseBtn = document.getElementById("finalise-btn");
-    const shareTable = document.getElementById("share-table");
+    
     let table = {};
 
     function getcsrfCookie(name) {
@@ -219,13 +219,17 @@ document.addEventListener("DOMContentLoaded", async function () {
         })
         .then(response => response.json())
         .then(data => {
-            shareTable.style.display = "block";
-            FinaliseBtn.style.display = "none";
-            // Handle any other finalization logic here
+            
+            
+            document.getElementById("finalizationModal").style.display = "flex";
         })
         .catch(error => console.error("Error finalizing:", error));
     });
-    const timerStartStr = document.getElementById('timer-start').dataset.value;
+    document.getElementById('ok-btn').addEventListener('click', function () {
+        document.getElementById("finalizationModal").style.display = "none";
+    });
+
+const timerStartStr = document.getElementById('timer-start').dataset.value;
 const timerDuration = parseFloat(document.getElementById('timer-duration').dataset.value);
 
 console.log("Timer Start String:", timerStartStr);

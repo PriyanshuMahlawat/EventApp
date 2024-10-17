@@ -36,7 +36,7 @@ class EventDetailSerializer(serializers.ModelSerializer):
     roomArr  = serializers.SerializerMethodField()
     class Meta:
         model = Event
-        fields = ['host_name','id','Event_name','event_time','roomArr','Detail','Event_Thumbnail','create_time']
+        fields = ['host_name','id','Event_name','event_time','roomArr','Detail','Event_Thumbnail','create_time','event_duration']
 
     def get_host_name(self,obj):
         return obj.host.username

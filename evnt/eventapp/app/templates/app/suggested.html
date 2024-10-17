@@ -22,10 +22,17 @@
         <button id="check-report-btn">Check Report</button>
     </div>
 </div>
+<div id="finalizationModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="checkmark">&#10004;</span> 
+        <p>Everything is set, the table is shared!</p>
+        <button id="ok-btn">OK</button>
+    </div>
+</div>
 <div id="timer-start" data-value="{{ timer_start }}"></div>
 <div id="timer-duration" data-value="{{ duration }}"></div>
 
-<button id="finalise-btn">Finalise</button><br>
-<button id="share-table" style="display: none;">Share to everyone!</button>
+<button id="finalise-btn">Finalise & Share to all.</button><br>
+
 <script src="{% static 'suggested.js' %}"></script>
 {% endblock %}
