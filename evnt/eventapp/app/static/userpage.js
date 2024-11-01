@@ -19,26 +19,31 @@ document.addEventListener("DOMContentLoaded", function () {
     const csrftoken = getCookie('csrftoken');
     const EventList = document.getElementById("event-list");
     var user_name = document.getElementById("user_name").textContent;
+ 
     var email = document.getElementById("email").textContent;
-
+    var logged_in = document.getElementById("logged_in").textContent;
+    let valid = true;
     console.log(email)
     fetch("http://localhost:8000/api/eventlist/")
         .then(response => response.json())
         .then(data => {
-
+            if (data.members === null) {
+                console.log("No members available.");
+                data.members = "";
+            }
             data.sort((a, b) => b.id - a.id);
-
+            console.log(data);
             addtolist(data);
         })
         .catch(error => console.error("Errors", error));
 
-    function addtolist(Arr) {
+    function addtolist(Arr){
         let n = Arr.length;
 
         for (let i = 0; i < n; i++) {
             let eventid = Arr[i].id
             let date = ` On ${Arr[i].event_time.slice(0, 10)}  at ${Arr[i].event_time.slice(11, 16)}`
-
+            let membersArr = Arr[i].members ? Arr[i].members.split(',') : [];
 
             let partlist = document.createElement("li");
             let evnm = document.createElement("p");
@@ -66,13 +71,28 @@ document.addEventListener("DOMContentLoaded", function () {
             const okBtn1 = document.getElementById("ok-btn1");
             const modal2 = document.getElementById("modal-outer2");
             const okBtn2 = document.getElementById("ok-btn2");
+            const modal3 = document.getElementById("modal-outer3");
+            const okBtn3 = document.getElementById("ok-btn3");
+            const modal4 = document.getElementById("modal-outer4");
+            const okBtn4 = document.getElementById("ok-btn4");
             joinbtn.addEventListener("click", function (event) {
                 event.preventDefault();
-                let valid = true
+                
                 console.log(email)
-                //if(email.slice(9,37) == "@hyderabad.bits-pilani.ac.in"){
-                //    valid = true
-                // }
+                console.log(user_name,membersArr)
+                if(user_name == "None"){
+                    valid =false;
+                    modal4.style.display = "flex";
+                }
+                if(membersArr.includes(user_name)){
+                    valid =false;
+                    modal2.style.display = "flex";
+                }
+                else if(user_name == Arr[i].host_name){
+                    valid =false;
+                    modal3.style.display = "flex";
+                }
+                
                 console.log(valid)
 
 
@@ -107,14 +127,12 @@ document.addEventListener("DOMContentLoaded", function () {
                                 console.error("Error:", error);
                             })
 
-                        modal1.style.display = "block";
+                        modal1.style.display = "flex";
                     }
 
 
                 }
-                else {
-                    modal2.style.display = "block";
-                }
+                
 
 
             })
@@ -128,33 +146,49 @@ document.addEventListener("DOMContentLoaded", function () {
                 modal2.style.display = "none";
 
             })
+            okBtn3.addEventListener("click", function (event) {
+                event.preventDefault();
+                modal3.style.display = "none";
+
+            })
+            okBtn4.addEventListener("click", function (event) {
+                event.preventDefault();
+                modal4.style.display = "none";
+
+            })
             detailbtn.addEventListener("click", function (event) {
                 event.preventDefault();
-                data = {
-                    'event_id': `${eventid}`,
+                if(logged_in == ""){
+                    modal4.style.display = 'flex';
                 }
-                console.log(data)
-                fetch("http://localhost:8000/api/id/", {
-                    method: "POST",
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': csrftoken,
-                    },
-                    body: JSON.stringify(data),
-                })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error("Response not ok:", response.statusText)
-                        }
-                        return response.json();
+                else{
+                    data = {
+                        'event_id': `${eventid}`,
+                    }
+                    console.log(data)
+                    fetch("http://localhost:8000/api/id/", {
+                        method: "POST",
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrftoken,
+                        },
+                        body: JSON.stringify(data),
                     })
-                    .then(data => {
-                        console.log('success', data);
-                        window.location.href = "http://localhost:8000/detail/";
-                    })
-                    .catch(error => {
-                        console.error("Error:", error);
-                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error("Response not ok:", response.statusText)
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log('success', data);
+                            window.location.href = "http://localhost:8000/detail/";
+                        })
+                        .catch(error => {
+                            console.error("Error:", error);
+                        })
+                }
+                
             })
 
             partlist.appendChild(evnm);

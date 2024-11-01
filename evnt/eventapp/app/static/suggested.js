@@ -220,7 +220,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         .then(response => response.json())
         .then(data => {
             
-            
+            console.log("Success");
             document.getElementById("finalizationModal").style.display = "flex";
         })
         .catch(error => console.error("Error finalizing:", error));

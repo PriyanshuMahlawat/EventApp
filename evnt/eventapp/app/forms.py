@@ -32,6 +32,7 @@ class EventForm(forms.ModelForm):
         event = super().save(commit=False)
         if user:
             event.host = user
+            event.members = user.username
             commit = True
         if commit:
             event.save()

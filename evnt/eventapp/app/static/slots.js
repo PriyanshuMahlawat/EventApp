@@ -132,54 +132,74 @@ document.addEventListener("DOMContentLoaded", async function() {
         let valid = true;
         let previousEndTime = null;
         const eventEndTime = new Date(eventStartTime.getTime() + duration * 1000);
-        console.log("Eventy_end time:",eventEndTime)
-
+    
+        console.log("Event Start Time:", eventStartTime);
+        console.log("Event End Time:", eventEndTime);
+    
         for (let i = 1; i <= count; i++) {
             let fromTime = document.getElementById(`s${i}-from`).value;
             let toTime = document.getElementById(`s${i}-to`).value;
-
-            // Convert time strings to Date objects for comparison
-            let fromDateTime = new Date(`${eventStartTime.toISOString().split('T')[0]}T${fromTime}:00`);
-            let toDateTime = new Date(`${eventStartTime.toISOString().split('T')[0]}T${toTime}:00`);
-
-            // Check if the first slot's start time is within the event time window
-            if(fromTime ==""|| toTime==""){
+    
+            // Log input times
+            console.log(`Slot ${i}: From Time: ${fromTime}, To Time: ${toTime}`);
+    
+            // Parse the time strings to create Date objects
+            let fromDateTime = new Date(eventStartTime);
+            let toDateTime = new Date(eventStartTime);
+            
+            let fromTimeParts = fromTime.split(':');
+            let toTimeParts = toTime.split(':');
+            
+            fromDateTime.setHours(parseInt(fromTimeParts[0]), parseInt(fromTimeParts[1]), 0);
+            toDateTime.setHours(parseInt(toTimeParts[0]), parseInt(toTimeParts[1]), 0);
+            
+            console.log(`Slot ${i}: From DateTime: ${fromDateTime}, To DateTime: ${toDateTime}`);
+    
+            // Check if times are empty
+            if (fromTime === "" || toTime === "") {
                 alert(`Fill the slots before submitting.`);
                 valid = false;
                 break;
             }
-            if (i === 1 && (fromDateTime < eventStartTime || fromDateTime > eventEndTime)) {
-                alert(`Slot 1: Start time must be within the event's scheduled time.`);
-                valid = false;
-                break;
+    
+            // Check if fromDateTime is within event time
+            if (i === 1) {
+                if (fromDateTime < eventStartTime || fromDateTime > eventEndTime) {
+                    alert(`Slot 1: Start time must be within the event's scheduled time.`);
+                    valid = false;
+                    break;
+                }
             }
-
-            // Check if the last slot's end time is within the event time window
-            if (i === count && (toDateTime > eventEndTime || toDateTime < eventStartTime)) {
-                alert(`Slot ${count}: End time must be within the event's scheduled time.`);
-                valid = false;
-                break;
+    
+            // Check if toDateTime is within event time
+            if (i === count) {
+                if (toDateTime > eventEndTime || toDateTime < eventStartTime) {
+                    alert(`Slot ${count}: End time must be within the event's scheduled time.`);
+                    valid = false;
+                    break;
+                }
             }
-
-            // Check if the "from" time is later than the previous "to" time
+    
+            // Check overlapping slots
             if (previousEndTime && fromDateTime < previousEndTime) {
                 alert(`Slot ${i}: Start time cannot be earlier than the previous slot's end time.`);
                 valid = false;
                 break;
             }
-
-            // Check if "from" time is less than "to" time for the same slot
+    
+            // Ensure start is before end
             if (fromDateTime >= toDateTime) {
                 alert(`Slot ${i}: Start time must be earlier than end time.`);
                 valid = false;
                 break;
             }
-
+    
             previousEndTime = toDateTime; // Update for the next iteration
         }
-        
+    
         return valid;
     }
+    
 
     // Handle form submission
     submitSlotsBtn.addEventListener("click", function(event) {

@@ -87,7 +87,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         postData = {
             "permission": `${name}-${rolesString}:${EId}`
         };
-        
+        console.log(postData);
         fetch(`http://localhost:8000/api/memberlistupdate/${EId}/`, {
             method: 'PATCH',
             headers: {

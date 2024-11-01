@@ -65,9 +65,11 @@ def completedpage(request):
     user= request.user
     if user.is_authenticated:
         username = user.username
+    else:
+        username = None
 
     
-    if Event.objects.filter(id=event_id).exists():
+    if Event.objects.filter(id=event_id).exists() and completedEvents.objects.filter(event_id = event_id).exists():
         Event.objects.filter(id=event_id).delete()  
 
     logged_in = False
@@ -134,10 +136,11 @@ def create_slots():
 
 
 def index(request):
-    logged_in = False
+    logged_in = ""
     image_url = None
+    
     if request.user.is_authenticated:
-        logged_in =True
+        logged_in ="1"
         person = request.user.username
         email = request.user.email
        
@@ -148,6 +151,7 @@ def index(request):
     else:
         person = None
         email = None
+    
     return render(request,"app/userpage.html",{"person":person,"email":email,"logged_in":logged_in,"image_url":image_url})
 
 def myeventtab(request):
@@ -329,6 +333,7 @@ def manage(request):
     logged_in = False
     image_url = None
     member = False
+    Nfinalised = True
     if request.user.is_authenticated:
         logged_in =True
         
@@ -340,7 +345,8 @@ def manage(request):
     event_id = request.COOKIES.get('event_id')
     event = Event.objects.get(id=event_id)
     
-
+    if FinalSlotsTable.objects.filter(Event_id =event_id).exists():
+        Nfinalised = False
     try:
         if event.members:
             if request.user.username in event.members.split(','):
@@ -352,7 +358,7 @@ def manage(request):
         return render(request, "app/manage.html", {"error": "Event not found"})
 
     person = request.user.username
-    
+    print(Nfinalised)
     context = {
         "member":member,
         "person": person,
@@ -361,7 +367,8 @@ def manage(request):
         "2v": False,
         "3v": False,
         "4v": False,
-        "host":False
+        "host":False,
+        "Nfinalised":Nfinalised,
     }
     
     if host:
@@ -611,11 +618,13 @@ class AddmembersAPIView(generics.UpdateAPIView):
     def update(self,request,*args,**kwargs):
         instance  =self.get_object()
         new_member = request.data.get('members','')
-
-        if instance.members:
-            instance.members += f",{new_member}"
-        else:
-            instance.members = new_member
+        existing_members = instance.members.split(',') if instance.members else []
+        if new_member not in existing_members:
+            
+            if instance.members:
+                instance.members += f",{new_member}"
+            else:
+                instance.members = new_member
 
         instance.save()
         serializer = self.get_serializer(instance)
@@ -670,7 +679,11 @@ class CurrentEventAPIView(APIView):
         return Response(serializer.data)
 
     def post(self, request):
+        
         current_event, created = CurrentEvent.objects.get_or_create(user=request.user)
+        
+            
+            
         serializer = CurrentEventSerializer(current_event, data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -697,103 +710,22 @@ class TableModificationsAPIView(APIView):
 
         return Response(serializer.data['table'])
     
-
-    def check(self, table, roomNew,count):
-        
-        Notacceptable = False
-        room_slots = table['slot'].get(roomNew, [])
-        if count==0:
-            
-            return True
-        
-        # If there are no slots or only one slot, there's no possibility of overlap
-        if len(room_slots) <= 1:
-            return Notacceptable
-
-        i = 0
-        while i < len(room_slots) - 1:  # Loop until the second-last slot to avoid out-of-range error
-            current_slot = room_slots[i]
-            next_slot = room_slots[i + 1]
-            
-            current_end = list(current_slot.values())[0][1]
-            next_start = list(next_slot.values())[0][0]
-
-            # Debugging: Print the current end and next start times
-            print(f"Comparing: Current End = {current_end}, Next Start = {next_start}")
-            
-            if not (current_end <= next_start):
-                Notacceptable = True
-                print(f"Slots overlap! End: {current_end}, Start: {next_start}")
-                break
-            i += 1
-        
-        return Notacceptable
-
-
-    def patch(self,request,**kwargs):
-        event_id = kwargs.get('pk')
-        
-        changes = request.data.get('changes')
-        modeltable = tablemodifications.objects.get(Event__id=event_id)
-        Arr = changes
-        nameString = Arr[0]
-        name = Arr[1]
-        roomIni= Arr[2] 
-        roomNew = Arr[3]
-        startTime = Arr[4] +":00"
-        endTime = Arr[5]+":00"
-        opTable = modeltable.table 
-        _count = nameString.count('_')
-        if _count ==0:
-            new_name= 'null'
-        else:
-            new_name = nameString.replace(f"_{name}", "")
-        roomsdictIni = opTable['slot'][roomIni] 
-
-        
-        
-        
-        found = False 
-        
-       
-        for slot in roomsdictIni:
-            if nameString in slot:
-                slot_times = slot[nameString]
-                
-                if slot_times == [startTime, endTime]:
-                    found = True
-
-                    slot[new_name] = slot.pop(nameString) 
-                    
-                    break
-        
-        if not found:
-            print(f"{nameString} with time slot {startTime} - {endTime} not found in any slot.")
-    
-    
-        opTable['slot'][roomIni] = roomsdictIni
-       
-            
+    def fix(self,opTable,startTime,endTime,name,roomNew):
         room_slots = opTable['slot'][roomNew]
-        print(f'room_slots{room_slots}')
-        print(len(room_slots))
-        i = 0
-        inserted = False
-        count=0
-        while self.check(opTable, roomNew, count):
-            count += 1
-            while i < len(room_slots):
+        i=0
+        inserted =False
+        while i < len(room_slots):
                 print('went in')
                 current_slot = room_slots[i]
                 current_start_time, current_end_time = list(current_slot.values())[0]
                 current_username = list(current_slot.keys())[0]
                 
-                # Avoid adding 'null' to a real username
-                new_name = current_username
+                
+                
                 if current_username != 'null' and name != 'null':
                     new_name = f"{current_username}_{name}"
                 elif name != 'null':
-                    new_name = name  # Assign the name directly if it's not null
+                    new_name = name  
             
                 if (startTime) == (current_start_time) and (endTime) < (current_end_time):
                     print("check1")
@@ -864,12 +796,193 @@ class TableModificationsAPIView(APIView):
 
                 i += 1
 
-            # Case 3: If not inserted yet, append to the end of the list (no overlap and last slot)
-            if not inserted:
+           
+        if not inserted:
                 room_slots.append({name: (startTime, endTime)})
 
-            # Step 3: Update the table with the modified room_slots
-            opTable['slot'][roomNew] = room_slots
+        
+        opTable['slot'][roomNew] = room_slots
+
+        return opTable
+    
+
+    def clean(self, table, room):
+        
+            room_slots = table['slot'][room]
+            cleaned_slots = []
+            
+            for slot in room_slots:
+            
+                for key in slot:
+                    if key is not None:
+                        usernamesArr = key.split('_')
+                        uniqueArr = list(set(usernamesArr))
+                        
+                        
+                        cleaned_slot = {('_'.join(uniqueArr)): slot[key]}
+                        cleaned_slots.append(cleaned_slot)
+                    else:
+                        cleaned_slot = {None: slot[key]}
+                        cleaned_slots.append(cleaned_slot)  
+            
+            table['slot'][room] = cleaned_slots
+        
+            return table
+
+
+    def patch(self,request,**kwargs):
+        event_id = kwargs.get('pk')
+        
+        changes = request.data.get('changes')
+        modeltable = tablemodifications.objects.get(Event__id=event_id)
+        Arr = changes
+        nameString = Arr[0]
+        name = Arr[1]
+        roomIni= Arr[2] 
+        roomNew = Arr[3]
+        startTime = Arr[4] +":00"
+        endTime = Arr[5]+":00"
+        opTable = modeltable.table 
+        _count = nameString.count('_')
+        if _count ==0:
+            new_name= 'null'
+        else:
+            new_name = nameString.replace(f"_{name}", "")
+        roomsdictIni = opTable['slot'][roomIni] 
+
+        
+        
+        
+        found = False 
+        
+       
+        for slot in roomsdictIni:
+            if nameString in slot:
+                slot_times = slot[nameString]
+                
+                if slot_times == [startTime, endTime]:
+                    found = True
+
+                    slot[new_name] = slot.pop(nameString) 
+                    
+                    break
+        
+        if not found:
+            print(f"{nameString} with time slot {startTime} - {endTime} not found in any slot.")
+    
+    
+        opTable['slot'][roomIni] = roomsdictIni
+       
+            
+        room_slots = opTable['slot'][roomNew]
+        print(f'room_slots{room_slots}')
+        print(len(room_slots))
+        i = 0
+        inserted = False
+        
+        
+            
+        while i < len(room_slots):
+                print('went in')
+                current_slot = room_slots[i]
+                current_start_time, current_end_time = list(current_slot.values())[0]
+                current_username = list(current_slot.keys())[0]
+                
+                
+                
+                if current_username != 'null' and name != 'null':
+                    new_name = f"{current_username}_{name}"
+                elif name != 'null':
+                    new_name = name  
+            
+                if (startTime) == (current_start_time) and (endTime) < (current_end_time):
+                    print("check1")
+                    room_slots[i] = {new_name: (startTime, endTime)}
+                    self.fix(opTable,endTime,current_end_time,current_username,roomNew)
+                    
+                    inserted = True
+                    break
+
+                elif (startTime) == (current_start_time) and (endTime) > (current_end_time):
+                    print("check2")
+                    room_slots[i] = {new_name: (current_start_time, current_end_time)}
+                    
+                    self.fix(opTable,current_end_time,endTime,name,roomNew)
+                    inserted = True
+                    break
+
+                elif (startTime) == (current_start_time) and (endTime) == (current_end_time):
+                    print("check3")
+                    room_slots[i] = {new_name: (startTime, endTime)}
+                    inserted = True
+                    break
+
+                elif (startTime) > (current_start_time) and (startTime) < (current_end_time):
+                    if (endTime) < (current_end_time):
+                        print("check4")
+                        room_slots[i] = {current_username: (current_start_time, startTime)}
+                        self.fix(opTable,startTime,endTime,new_name,roomNew)
+                        
+                        self.fix(opTable,endTime,current_end_time,current_username,roomNew)
+                        
+                        inserted = True
+                        break
+
+                    elif (endTime) == (current_end_time):
+                        print("check5")
+                        room_slots[i] = {current_username: (current_start_time, startTime)}
+                        self.fix(opTable,startTime,endTime,new_name,roomNew)
+                        
+                        inserted = True
+                        break
+
+                    elif (endTime) > (current_end_time):
+                        print("check6")
+                        room_slots[i] = {current_username: (current_start_time, startTime)}
+                        self.fix(opTable,startTime,current_end_time,new_name,roomNew)
+                        
+                        self.fix(opTable,current_end_time,endTime,name,roomNew)
+                        
+                        inserted = True
+                        break
+
+                elif (startTime) < (current_start_time) and (endTime) < (current_end_time):
+                    print("check7")
+                    room_slots[i] = {name: (startTime, current_start_time)}
+                    self.fix(opTable,current_start_time,endTime,new_name,roomNew)
+                    
+                    self.fix(opTable,endTime,current_end_time,current_username,roomNew)
+                    
+                    inserted = True
+                    break
+
+                elif (startTime) < (current_start_time) and (endTime) > (current_end_time):
+                    print("check8")
+                    room_slots[i] = {name: (startTime, current_start_time)}
+                    self.fix(opTable,current_start_time,current_end_time,new_name,roomNew)
+                    
+                    self.fix(opTable,current_end_time,endTime,name,roomNew)
+                    
+                    inserted = True
+                    break
+
+                elif (startTime) < (current_start_time) and (endTime) == (current_end_time):
+                    print("check9")
+                    room_slots[i] = {name: (startTime, current_start_time)}
+                    self.fix(opTable,current_start_time,current_end_time,new_name,roomNew)
+                    
+                    inserted = True
+                    break
+
+                i += 1
+
+           
+        if not inserted:
+                room_slots.append({name: (startTime, endTime)})
+
+        
+        opTable['slot'][roomNew] = room_slots
+        opTable = self.clean(opTable,roomNew)
 
         print(opTable)
         serializer = tablemodificationsSerializer(modeltable, data={'table': opTable}, partial=True)
@@ -1052,7 +1165,7 @@ class CompletedEventGetAPIView(APIView):
                 response_data['hosted'].append(record)
 
             
-            if username in event.members.split(',') and event.excel:
+            if username in event.members.split(',') and event.excel and username != event.host:
                 record = {
                     'Event_name': event.Event_name,
                     'excel_link': event.excel.url  

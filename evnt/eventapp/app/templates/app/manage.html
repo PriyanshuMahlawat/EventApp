@@ -9,7 +9,7 @@
 <p id="host-name">By: </p>
 
 <div class="button-container">
-    {% if member %}
+    {% if member or host %}
     <th><a href="{% url 'slotnoti' %}"><button>Assigned Slots</button></a></th>
     {% endif %}
     {% if 1v %}
@@ -23,7 +23,7 @@
     {% if live %}
     <th><a href="{% url 'adminpage' %}"><button>Event Live</button></a></th>
     {% endif %}
-    {% if host %}
+    {% if host and Nfinalised %}
     <th><a href="{% url 'suggested' %}"><button id="suggest">Suggest Lineup</button>
     </a></th>
     {% else %}

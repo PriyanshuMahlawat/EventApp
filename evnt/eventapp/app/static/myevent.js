@@ -23,6 +23,7 @@ document.addEventListener("DOMContentLoaded", function() {
     fetch("http://localhost:8000/api/host/")
     .then(response => response.json())
     .then(data => {
+        console.log(data)
         addToHost(data);
     })
     .catch(error => {
@@ -31,12 +32,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function addToHost(data) {
         
-        if (data.length === 1 && data[0].eve_names.length===0) {
-            hostedlistEl.innerHTML = `<li>No Events Hosted.</li>`;
-        } else {
+            let count1 = 0;
             for (let i = 0; i < data.length; i++) {
                 var arr = data[i].eve_names;
-                let listEl = document.createElement("li");
+                if(arr[i]){
+                    let listEl = document.createElement("li");
                 let paraEl = document.createElement("p");
                 let dellink = document.createElement("a");
                 let managelink = document.createElement("a");
@@ -109,14 +109,20 @@ document.addEventListener("DOMContentLoaded", function() {
                 listEl.appendChild(dellink);
                 listEl.appendChild(managelink);
                 hostedlistEl.appendChild(listEl);
+                count1+=1;
             }
-        }
+                }
+            if(count1==0){
+                hostedlistEl.innerHTML = `<li>No Events Hosted.</li>`;
+            }
     }
 
     
     fetch("http://localhost:8000/api/joined/")
     .then(response => response.json())
     .then(data => {
+        console.log(data);
+
         addToJoined(data);
     })
     .catch(error => {
@@ -124,13 +130,15 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     function addToJoined(data) {
-        
-        if (data.length === 1 && data[0].joined_Events.length===0) {
-            joinedlistEl.innerHTML = `<li>No Events Joined.</li>`;
-        } else {
+        console.log(data.length)
+            let count = 0;
             for (let i = 0; i < data.length; i++) {
                 var arr = data[i].joined_Events;
-                let listEl = document.createElement("li");
+                if (arr.length === 0) {
+                    continue;  
+                }
+                if(arr[i]){
+                    let listEl = document.createElement("li");
                 let paraEl = document.createElement("p");
                 let leavelink = document.createElement("a");
                 let managelink1 = document.createElement("a");
@@ -202,7 +210,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 managelink1.appendChild(manageBtn1);
                 listEl.appendChild(managelink1);
                 joinedlistEl.appendChild(listEl);
+                count+=1;
             }
-        }
+                }
+            if(count==0){
+                joinedlistEl.innerHTML = `<li>No Events Joined.</li>`; 
+            }
+        
     }
 });

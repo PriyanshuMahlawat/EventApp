@@ -40,18 +40,20 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
-    function update(data){
+    function update(data) {
+        let isFormData = data instanceof FormData;
+        
         fetch(`http://localhost:8000/api/${id}/`, {
             method: "PATCH",
             headers: {
-                'Content-Type': 'application/json',
                 'X-CSRFToken': csrftoken,
+                ...(isFormData ? {} : {'Content-Type': 'application/json'}) // Set content type only if not FormData
             },
-            body: JSON.stringify(data),
+            body: data, // Send data directly
         })
         .then(response => {
             if (!response.ok) {
-                throw new Error("Response not ok:", response.statusText)
+                throw new Error("Response not ok: " + response.statusText);
             }
             return response.json();
         })
@@ -61,9 +63,8 @@ document.addEventListener("DOMContentLoaded", function() {
         })
         .catch(error => {
             console.error("Error:", error);
-        })
+        });
     }
-
     function showSuccessModal() {
         const successModal = document.getElementById("modal-outer-success");
         successModal.style.display = "flex";
@@ -71,31 +72,38 @@ document.addEventListener("DOMContentLoaded", function() {
 
     document.getElementById("change1").addEventListener("click", function() {
         var data = { 'Event_name': document.getElementById("name").value };
-        update(data);
+        update(JSON.stringify(data));
         modals[0].style.display = "none";
     });
 
     document.getElementById("change2").addEventListener("click", function() {
-        var data = { 'Event_Thumbnail': document.getElementById("image").files[0] };
-        update(data);
-        modals[1].style.display = "none";
+        var formData = new FormData();
+        var fileInput = document.getElementById("image").files[0];
+    
+        if (fileInput) {
+            formData.append('Event_Thumbnail', fileInput);
+            update(formData); 
+            modals[1].style.display = "none";
+        } else {
+            console.error("No file selected.");
+        }
     });
 
     document.getElementById("change3").addEventListener("click", function() {
-        var data = { 'create_time': document.getElementById("time").value };
-        update(data);
+        var data = {'event_time': document.getElementById("time").value };
+        update(JSON.stringify(data));
         modals[2].style.display = "none";
     });
 
     document.getElementById("change4").addEventListener("click", function() {
         var data = { 'roomArr': document.getElementById("rooms").value };
-        update(data);
+        update(JSON.stringify(data));
         modals[3].style.display = "none";
     });
 
     document.getElementById("change5").addEventListener("click", function() {
         var data = { 'Detail': document.getElementById("detail").value };
-        update(data);
+        update(JSON.stringify(data));
         modals[4].style.display = "none";
     });
 

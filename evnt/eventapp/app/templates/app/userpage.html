@@ -8,6 +8,7 @@
 <div class="content">
     <p id="user_name" style="display: none;">{{ person }}</p>
     <p id="email" style="display: none;">{{ email }}</p>
+    <p id="logged_in" style="display: none;">{{ logged_in }}</p>
     <ul id="event-list">
         
     </ul>
@@ -23,12 +24,25 @@
 
 <div id="modal-outer2" class="modal-outer">
     <div id="modal-inner2" class="modal-inner">
-        <p>You can't join this event.</p>
-        <p>You need to be a BPHC student. Please check that you've logged in with your BITS-gmail.</p>
+        <p>You already are a member.</p>
+        
         <button id="ok-btn2" class="modal-btn">OK</button>
     </div>
 </div>
-
+<div id="modal-outer3" class="modal-outer">
+    <div id="modal-inner3" class="modal-inner">
+        <p>Hosts don't need to join.</p>
+        
+        <button id="ok-btn3" class="modal-btn">OK</button>
+    </div>
+</div>
+<div id="modal-outer4" class="modal-outer">
+    <div id="modal-inner4" class="modal-inner">
+        <p>You need to Login!</p>
+        
+        <button id="ok-btn4" class="modal-btn">OK</button>
+    </div>
+</div>
 <script src="{% static 'userpage.js' %}"></script>
 {% endblock %}
 

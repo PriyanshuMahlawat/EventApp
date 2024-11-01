@@ -11,7 +11,7 @@ class EventSerializer(serializers.ModelSerializer):
     roomArr  = serializers.SerializerMethodField()
     class Meta:
         model = Event
-        fields = ['host_name','id','Event_name','event_time','roomArr','Event_Thumbnail']
+        fields = ['host_name','id','Event_name','event_time','roomArr','Event_Thumbnail','members']
 
     def get_host_name(self,obj):
         return obj.host.username
@@ -67,56 +67,93 @@ class MembersListSerializer(serializers.ModelSerializer):
         permissionString = validated_data.get('permission')
         former = permissionString.split(':')[0]
         id = permissionString.split(':')[1]
-        username0 = former.split('-')[0]
+        username0 = former.split('-')[0] 
         roleString = former.split('-')[1]
-        
-        
-        
+  
         user = User.objects.get(username=username0)
         
-          
+ 
+        event_content_type = ContentType.objects.get_for_model(Event)
+        notifications_content_type = ContentType.objects.get_for_model(Notifications)
         if roleString:
-            event_content_type = ContentType.objects.get_for_model(Event)
             if '1' in roleString:
-                group, created  = Group.objects.get_or_create(name=f'Add Members{id}')
-                perms = ['add_event','view_event','add_notifications','view_notifications','delete_notifications','change_notifications']
-                for perm in perms:
-
-                    permission = Permission.objects.get(codename =perm,content_type=event_content_type ) 
+                group, created = Group.objects.get_or_create(name=f'Add Members{id}')
+                
+                # Permissions for both Event and Notifications models
+                perms = [
+                    ('add_event', event_content_type), 
+                    ('view_event', event_content_type), 
+                    ('add_notifications', notifications_content_type), 
+                    ('view_notifications', notifications_content_type), 
+                    ('delete_notifications', notifications_content_type), 
+                    ('change_notifications', notifications_content_type)
+                ]
+                
+                # Assign permissions based on model's content type
+                for perm, content_type in perms:
+                    permission = Permission.objects.get(codename=perm, content_type=content_type)
                     group.permissions.add(permission)
-
+                
                 group.save()
                 user.groups.add(group)
+
             if '2' in roleString:
-                group, created  = Group.objects.get_or_create(name=f'Allow Noti{id}')
-                perms = ['add_event','view_event']
-                for perm in perms:
-
-                    permission = Permission.objects.get(codename =perm,content_type=event_content_type ) 
+                group, created = Group.objects.get_or_create(name=f'Allow Noti{id}')
+                
+                # Only Event-related permissions
+                perms = [
+                    ('add_event', event_content_type), 
+                    ('view_event', event_content_type)
+                ]
+                
+                for perm, content_type in perms:
+                    permission = Permission.objects.get(codename=perm, content_type=content_type)
                     group.permissions.add(permission)
-
-                group.save()                
+                
+                group.save()
                 user.groups.add(group)
+
             if '3' in roleString:
-                group, created  = Group.objects.get_or_create(name=f'Remove Members{id}')
-                perms = ['add_event','view_event']
-                for perm in perms:
-
-                    permission = Permission.objects.get(codename =perm,content_type=event_content_type ) 
+                group, created = Group.objects.get_or_create(name=f'Remove Members{id}')
+                
+                # Only Event-related permissions
+                perms = [
+                    ('add_event', event_content_type), 
+                    ('view_event', event_content_type)
+                ]
+                
+                for perm, content_type in perms:
+                    permission = Permission.objects.get(codename=perm, content_type=content_type)
                     group.permissions.add(permission)
-
+                
                 group.save()
                 user.groups.add(group)
+
             if '4' in roleString:
-                group, created  = Group.objects.get_or_create(name=f'Edit Event{id}')
-                perms = ['add_event','view_event','change_event','delete_event']
-                for perm in perms:
-
-                    permission = Permission.objects.get(codename =perm,content_type=event_content_type ) 
+                group, created = Group.objects.get_or_create(name=f'Edit Event{id}')
+                
+                # Only Event-related permissions
+                perms = [
+                    ('add_event', event_content_type), 
+                    ('view_event', event_content_type), 
+                    ('change_event', event_content_type), 
+                    ('delete_event', event_content_type)
+                ]
+                
+                for perm, content_type in perms:
+                    permission = Permission.objects.get(codename=perm, content_type=content_type)
                     group.permissions.add(permission)
-
+                
                 group.save()
-                user.groups.add(group) 
+                user.groups.add(group)
+        else:
+            groups = user.groups.all()
+    
+   
+            for group in groups:
+                group.permissions.clear()  # Clear all permissions from the group
+                user.groups.remove(group) 
+
                 
 
             user.save()
@@ -132,10 +169,14 @@ class NotiSerializer(serializers.ModelSerializer):
         fields = ['name', 'create_time', 'Event_id','id']
 
     def create(self,validated_data):
-        
         name = validated_data.get('name')
         event_id = validated_data.get('Event_id')
         event = Event.objects.get(id=event_id)
+        existing_members = event.members.split(',') if event.members else []
+        if name in existing_members:
+            raise serializers.ValidationError({"detail": "Name is not a member of the event."})
+        
+        
         notification,created=Notifications.objects.get_or_create(Event=event,name=name) 
         return notification
          
@@ -179,7 +220,10 @@ class JoinedEventsSerializer(serializers.ModelSerializer):
             for e in Event.objects.all():
                 
                 memberStr = e.members
-                memberArray = memberStr.split(",")
+                if memberStr:
+                    memberArray = memberStr.split(",")
+                else:
+                    memberArray = []
                 boo = user_name in memberArray
                 if e.members and boo:
                     joined_Events.append({

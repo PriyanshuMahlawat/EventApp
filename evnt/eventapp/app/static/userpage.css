@@ -66,7 +66,7 @@
     align-items: center;
     justify-content: center;
     z-index: 1000;
-    display: none; /* Hidden by default */
+    display: none; 
 }
 
 .modal-inner {
