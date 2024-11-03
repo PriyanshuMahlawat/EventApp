@@ -12,7 +12,6 @@ from datetime import datetime
 import pytz
 from django.http import HttpResponse,FileResponse
 from openpyxl import Workbook
-import cloudinary.uploader
 from django.contrib.auth.models import User
 from rest_framework.permissions import IsAuthenticated
 from django.views.decorators.csrf import csrf_exempt
@@ -1025,70 +1024,56 @@ class FinalTableAPIView(generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         event_id = kwargs.get('pk')
-        
-        # Fetch data from API
         endpoint = f"http://localhost:8000/api/tablemodify/{event_id}/"
         response = requests.get(endpoint)
-        if response.status_code != 200:
-            return Response({"error": "Failed to fetch data from API"}, status=500)
-            
-        data = response.json()
-        print("Fetched data:", data)
+        if response.status_code ==200:
+            data = response.json()
+            print("fetched data:",data)
+        else:
+            print(f"error:{response.status_code}")
         
-        try:
-            event = Event.objects.get(id=event_id)
-            Ename = event.Event_name
-            
-            # Prepare rows for Excel
-            rows = []
-            for room_id, slots in data['slot'].items():
-                for slot in slots:
-                    user = list(slot.keys())[0]
-                    times = slot[user]
-                    rows.append({
-                        "Room": room_id,
-                        'Name': user if user != 'null' else 'Empty',
-                        'Start Time': times[0],
-                        'End Time': times[1],
-                    })
-                # Add empty rows for visual separation
-                rows.append({"Room": '', 'Name': '', 'Start Time': '', 'End Time': ''})
-                rows.append({"Room": '', 'Name': '', 'Start Time': '', 'End Time': ''})
 
-            # Create Excel file in memory
-            df = pd.DataFrame(rows)
-            excel_buffer = io.BytesIO()
-            with pd.ExcelWriter(excel_buffer, engine='openpyxl') as writer:
-                df.to_excel(writer, index=False)
-            excel_buffer.seek(0)
-            
-            # Generate a unique filename
-            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-            excel_file_name = f"{Ename}_eventSlots_{timestamp}.xlsx"
-            
-            # Upload to Cloudinary directly
-            cloudinary_response = cloudinary.uploader.upload(
-                excel_buffer,
-                resource_type="raw",
-                public_id=f"excel_files/{excel_file_name}",
-                folder="event_slots",
-                format="xlsx"
-            )
-            
-            # Create or update FinalSlotsTable instance
-            model, created = FinalSlotsTable.objects.get_or_create(Event=event)
-            model.excel_file = cloudinary_response['secure_url']
-            model.save()
-            
-            # Return response
-            serializer = self.get_serializer(model)
-            return Response(serializer.data)
-            
-        except Event.DoesNotExist:
-            return Response({"error": "Event not found"}, status=404)
-        except Exception as e:
-            print(f"Error processing request: {str(e)}")
-            return Response({"error": str(e)}, status=500)
+        event = Event.objects.get(id=event_id)
+        Ename = event.Event_name
+
+
+        rows = []
+        for room_id,slots in data['slot'].items():
+            for slot in slots:
+                user = list(slot.keys())[0]
+                times = slot[user]
+                rows.append({
+                    "Room":room_id,
+                    'Name': user if user!= 'null' else 'Empty',
+                    'Start Time': times[0],
+                    'End Time': times[1],
+                })
+            rows.append({
+            "Room": '',  # or None
+            'Name': '',
+            'Start Time': '',
+            'End Time': ''
+            })
+            rows.append({
+            "Room": '',  # or None
+            'Name': '',
+            'Start Time': '',
+            'End Time': ''
+            })
+        
+        df = pd.DataFrame(rows)
+        excel_file_name = f"{Ename}_eventSlots.xlsx"
+        excel_file_path = os.path.join(settings.MEDIA_ROOT, 'finaltable', excel_file_name)
+        df.to_excel(excel_file_path, index=False)
+
+        
+        model, created = FinalSlotsTable.objects.get_or_create(Event=event)
+        model.excel_file = f"finaltable/{excel_file_name}"
+        model.save()
+
+        
+        serializer = self.get_serializer(model)
+        return Response(serializer.data)    
 
         
 
@@ -1103,70 +1088,57 @@ class CompletedEventsSerializerView(generics.CreateAPIView):
     serializer_class = CompletedEventsSerializer
 
     def create(self, request, *args, **kwargs):
+        
         data = request.data
-        event_id = kwargs.get('event_id')
-
-        # Initialize Excel workbook and sheet
+        print(f"reqeust{data}")
+        data = request.data
+        print(f'kwargs{kwargs}')
+        event_id  = kwargs.get('event_id')
+        
         wb = Workbook()
         ws = wb.active
         ws.title = f'Event_Report-{event_id}'
         
-        ws.append(['Username', 'Room', 'Time_Spent', 'Total_Work_Time'])
-        row = 2
-        for username, user_data in data.items():
+        ws.append(['Username','Room','Time_Spent','Total_Work_Time'])
+        row=2
+        for username,user_data in data.items():
             records = user_data.get('records', [])
             n = len(records)
-            total_time = sum(record.get('time_spent', 0) for record in records)
-            ws.merge_cells(start_row=row, start_column=1, end_row=row + n - 1, end_column=1)
-            ws.merge_cells(start_row=row, start_column=4, end_row=row + n - 1, end_column=4)
-            ws.cell(row=row, column=1, value=username)
-            ws.cell(row=row, column=4, value=total_time)
+            total_time = sum(record.get('time_spent',0) for record in records)
+            ws.merge_cells(start_row=row,start_column=1,end_row=row+n-1,end_column=1)
+            ws.merge_cells(start_row=row,start_column=4,end_row=row+n-1,end_column=4)
+            ws.cell(row=row,column=1,value=username)
+            ws.cell(row=row,column=4,value=total_time)
             for record in records:
-                ws.cell(row=row, column=2, value=record['room'])
-                ws.cell(row=row, column=3, value=record['time_spent'])
-                row += 1
+                ws.cell(row=row,column=2,value=record['room'])
+                ws.cell(row=row,column=3,value=record['time_spent'])
+                row+=1
+        
+        excel_file = io.BytesIO()
+        wb.save(excel_file)
+        excel_file.seek(0)
 
-        # Save the workbook to an in-memory buffer
-        excel_buffer = io.BytesIO()
-        wb.save(excel_buffer)
-        excel_buffer.seek(0)
+        event = Event.objects.get(id=event_id)
+        model, created = completedEvents.objects.get_or_create(
+            id=event_id, 
+            defaults={
+                'event_id': event_id,
+                'host': event.host.username,
+                'Event_name': event.Event_name,
+                'members': event.members,
+            }
+        )
+        model.save()
+        file_name = f'Event_Records.xlsx'
+        model.excel.save(file_name,ContentFile(excel_file.read()))
+        
+        
+        event = Event.objects.get(id=event_id)
+        
 
-        try:
-            event = Event.objects.get(id=event_id)
-            
-            # Generate a unique filename and upload to Cloudinary
-            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-            file_name = f"{event.Event_name}_Event_Records_{timestamp}.xlsx"
-
-            cloudinary_response = cloudinary.uploader.upload(
-                excel_buffer,
-                resource_type="raw",
-                public_id=f"excel_files/{file_name}",
-                folder="event_records",
-                format="xlsx"
-            )
-
-            # Create or update CompletedEvents instance with Cloudinary URL
-            model, created = completedEvents.objects.update_or_create(
-                id=event_id,
-                defaults={
-                    'event_id': event_id,
-                    'host': event.host.username,
-                    'Event_name': event.Event_name,
-                    'members': event.members,
-                    'excel': cloudinary_response['secure_url']
-                }
-            )
-
-            # Serialize and return response
-            serializer = self.get_serializer(model)
-            return Response(serializer.data)
-
-        except Event.DoesNotExist:
-            return Response({"error": "Event not found"}, status=404)
-        except Exception as e:
-            print(f"Error processing request: {str(e)}")
-            return Response({"error": str(e)}, status=500)
+        serializer = self.get_serializer(model)
+        return Response(serializer.data)
+    
     
     
         
@@ -1188,7 +1160,7 @@ class CompletedEventGetAPIView(APIView):
             if username == event.host and event.excel:
                 record = {
                     'Event_name': event.Event_name,
-                    'excel_link': event.excel  
+                    'excel_link': event.excel.url  
                 }
                 response_data['hosted'].append(record)
 
@@ -1196,7 +1168,7 @@ class CompletedEventGetAPIView(APIView):
             if username in event.members.split(',') and event.excel and username != event.host:
                 record = {
                     'Event_name': event.Event_name,
-                    'excel_link': event.excel 
+                    'excel_link': event.excel.url  
                 }
                 response_data['joined'].append(record)
         print(f"data{response_data}")

@@ -11,17 +11,6 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-import cloudinary
-import cloudinary.uploader
-import cloudinary.api
-
-
-
-
-
-
-
-
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -35,9 +24,9 @@ TEMPLATE_DIR = BASE_DIR / 'templates'
 SECRET_KEY = "django-insecure-l1079b4vj6ulyq_2-p4%kd2abmktc6qt3&aory6^gw+unny8t("
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['localhost','amithehost.onrender.com']
+ALLOWED_HOSTS = ['localhost','.vercel.app']
 
 
 # Application definition
@@ -170,8 +159,11 @@ STATIC_ROOT = "staticfiles"
 STATICFILES_DIRS = [
     BASE_DIR / "app/static",
 ]
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
+MEDIA_URL = "media/"
+MEDIA_ROOT = "mediafiles"
+MEDIAFILES_DIRS =[
+    BASE_DIR / "app/media",
+]
 
 
 
@@ -190,22 +182,3 @@ ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_SIGNUP_REDIRECT_URL = '/'  # Where to redirect after signup
 ACCOUNT_AUTHENTICATION_METHOD = 'email'  # Since we're using email for Google
-
-
-
-
-
-
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-cloudinary.config(
-    cloud_name = 'dcvxjzsdj', 
-    api_key = '655534359278611', 
-    api_secret = 'azApQFPUWLdFJYlgMp4MNJ8tcvA',
-)
-
-# Change MEDIA_URL to use Cloudinary
-MEDIA_URL = "https://res.cloudinary.com/dcvxjzsdj/"
-
-# You can keep MEDIA_ROOT if you're also storing files locally for development.
-# If you don't want to store them locally, you can omit MEDIA_ROOT
-MEDIA_ROOT = BASE_DIR / "mediafiles"  # This is optional; mainly for local dev

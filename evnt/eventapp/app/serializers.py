@@ -8,25 +8,19 @@ import pytz
 
 class EventSerializer(serializers.ModelSerializer):
     host_name = serializers.SerializerMethodField()
-    roomArr = serializers.SerializerMethodField()
-    Event_Thumbnail = serializers.SerializerMethodField()  # Add this line
-
+    roomArr  = serializers.SerializerMethodField()
     class Meta:
         model = Event
-        fields = ['host_name', 'id', 'Event_name', 'event_time', 'roomArr', 'Event_Thumbnail', 'members']
+        fields = ['host_name','id','Event_name','event_time','roomArr','Event_Thumbnail','members']
 
-    def get_host_name(self, obj):
+    def get_host_name(self,obj):
         return obj.host.username
-
-    def get_roomArr(self, obj):
-        roomArr = obj.rooms.replace(" ", "").split(",")
+    
+    def get_roomArr(self,obj):
+        roomArr = obj.rooms.replace(" ","")
+        roomArr = roomArr.split(",")
         return roomArr
 
-    def get_Event_Thumbnail(self, obj):
-        # Construct the full URL for the image
-        if obj.Event_Thumbnail:
-            return f"https://res.cloudinary.com/dcvxjzsdj/image/upload/{obj.Event_Thumbnail}"
-        return None
 
 class slotsSerializer(serializers.ModelSerializer):
 
@@ -308,18 +302,17 @@ class tableSlotSerializer(serializers.ModelSerializer):
         EendTime = EendTime.astimezone(timezone)
         tableSlot = {room: [] for room in roomsArr}
         remaining_event_slots = list(eventSlots)
-        
 
-        
         def get_start_time(slot):
-            if slot.slots:  # Access the correct field name 'slots'
+            
+            if slot.slots:
                 for key, time in slot.slots.items():
                     starttime_str, _ = time.strip('()').split(',')
                     starttime = datetime.strptime(starttime_str.strip(), '%H:%M')
-                    # Localize the starttime to the specified timezone
-                    starttime = timezone.localize(starttime)  # Make it timezone-aware
+                    if starttime.tzinfo is None:
+                        starttime = timezone.localize(starttime)
                     return starttime
-            return datetime.max.replace(tzinfo=timezone) 
+            return None
 
         remaining_event_slots.sort(key=get_start_time)
 
@@ -364,7 +357,7 @@ class tableSlotSerializer(serializers.ModelSerializer):
 
         
        
-        
+        # Safety mechanism to prevent infinite loops
         MAX_RETRIES = 3
 
 
