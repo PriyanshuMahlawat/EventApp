@@ -14,9 +14,8 @@ from pathlib import Path
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
-
-
-
+import os
+import dj_database_url
 
 
 
@@ -28,11 +27,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 TEMPLATE_DIR = BASE_DIR / 'templates'
 
 
+DATABASES = {
+    'default': dj_database_url.config(default='sqlite:///' + str(BASE_DIR / "db.sqlite3"))
+}
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-l1079b4vj6ulyq_2-p4%kd2abmktc6qt3&aory6^gw+unny8t("
+# SECURITY WARNING: keep the secret key used in production secret!"
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "django-insecure-l1079b4vj6ulyq_2-p4%kd2abmktc6qt3&aory6^gw+unny8t(")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -121,12 +124,7 @@ WSGI_APPLICATION = "eventapp.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
+
 
 
 # Password validation
