@@ -75,7 +75,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const okBtn3 = document.getElementById("ok-btn3");
             const modal4 = document.getElementById("modal-outer4");
             const okBtn4 = document.getElementById("ok-btn4");
-            joinbtn.addEventListener("click", function (event) {
+            joinbtn.addEventListener("click", function (event){
                 event.preventDefault();
                 
                 console.log(email)
