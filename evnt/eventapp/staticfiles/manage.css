@@ -1,0 +1,152 @@
+/* General page layout */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+
+/* Style for the event name and host name */
+#event-name {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
+    text-align: center;
+}
+
+#host-name {
+    font-size: 16px;
+    margin-bottom: 20px;
+    color: #555;
+    text-align: center;
+}
+
+/* Align buttons vertically with the same width */
+.button-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.button-container th {
+    width: 80%;
+    margin-bottom: 10px;
+}
+
+th a button {
+    width: 100%;
+    padding: 15px;
+    background-color: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    position: relative;
+}
+
+/* Hover effects with additional text */
+th a button:hover {
+    background-color: #1976D2;
+    transform: scale(1.05);
+}
+
+th a button::after {
+    content: attr(data-hover-text);
+    position: absolute;
+    left: 50%;
+    bottom: -30px;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: white;
+    padding: 5px;
+    border-radius: 3px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+th a button:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Additional styling for buttons */
+button {
+    padding: 15px;
+    background-color: #1976D2;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 200px;
+    margin-bottom: 10px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #d32f2f;
+}
+
+/* Style for links */
+a {
+    text-decoration: none;
+}
+
+/* Responsive design adjustments */
+@media (max-width: 768px) {
+    .button-container th {
+        width: 100%;
+    }
+
+    th a button {
+        font-size: 14px;
+        padding: 12px;
+    }
+
+    #event-name {
+        font-size: 20px;
+    }
+
+    #host-name {
+        font-size: 14px;
+    }
+}
+#modalOuterEndEvent {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+#modalInnerEndEvent {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+#modalInnerEndEvent button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin-top: 15px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+#modalInnerEndEvent button:hover {
+    background-color: #45a049;
+}

@@ -1,0 +1,77 @@
+body {
+    font-family: 'Arial', sans-serif;
+   
+}
+
+p {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+li {
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    background-color: #ffffff;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+li:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.event-name {
+    font-size: 1.4em;
+    font-weight: bold;
+    color: #f39c12; /* Orange for event name */
+    background-color: #fef5e7; /* Light orange background */
+    padding: 8px;
+    border-radius: 5px;
+    display: inline-block;
+    margin-bottom: 5px;
+    transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+.event-name:hover {
+    color: #e67e22; /* Darker orange on hover */
+    background-color: #fdf2e3;
+}
+
+li .event-report {
+    font-size: 1em;
+    color: #3498db; /* Blue for the Excel sheet link */
+    text-decoration: none;
+    display: block;
+    margin-top: 5px;
+    font-weight: normal;
+    transition: color 0.3s ease;
+}
+
+li .event-report:hover {
+    color: #2980b9; /* Darker blue on hover */
+}
+
+#hosted-list, #joined-list {
+    margin-bottom: 30px;
+}
+
+.empty-message {
+    color: #888;
+    font-size: 1.1em;
+    padding: 10px;
+    text-align: center;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    background-color: #fafafa;
+    margin-top: 20px;
+}

@@ -4,6 +4,7 @@ import cloudinary
 import cloudinary.uploader
 import cloudinary.api
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 TEMPLATE_DIR = BASE_DIR / 'templates'
@@ -34,6 +35,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "app",
+    'cloudinary',
+    
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -141,3 +144,5 @@ cloudinary.config(
 
 MEDIA_URL = "https://res.cloudinary.com/dcvxjzsdj/"
 MEDIA_ROOT = BASE_DIR / "mediafiles"  # Optional for local dev
+
+
