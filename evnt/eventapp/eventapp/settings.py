@@ -22,7 +22,14 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "django-insecure-l1079b4vj6ulyq
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '0.0.0.0', '127.0.0.1', 'amithehost.onrender.com']
+ALLOWED_HOSTS = [
+    "localhost",
+    "0.0.0.0",
+    "127.0.0.1",
+    "amithehost.onrender.com",
+    "iamhosting.onrender.com",  # Add this!
+]
+
 
 # Application definition
 INSTALLED_APPS = [
