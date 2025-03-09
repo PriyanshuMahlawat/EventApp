@@ -84,8 +84,6 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
-SITE_ID = 1
-
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'SCOPE': [
@@ -97,6 +95,19 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     }
 }
+
+SITE_ID = 1
+
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv("SOCIAL_AUTH_GOOGLE_OAUTH2_KEY")
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv("SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET")
+
+
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://iamhosting.onrender.com",
+]
+
 
 WSGI_APPLICATION = "eventapp.wsgi.application"
 
