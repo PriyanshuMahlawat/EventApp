@@ -1,4 +1,4 @@
-📅 **IamHosting - Event Management & Team Coordination App*
+📅 IamHosting - Event Management & Team Coordination App
 
 🚀 About the App
 
