@@ -1,8 +1,6 @@
 📅 IamHosting - Event Management & Team Coordination App
 
 🚀 About the App
-
-  Made with ❤️ by Priyanshu
   
   Welcome to IamHosting - The Event Management & Team Coordination Platform! This app is designed for individuals and teams to seamlessly manage events, coordinate team activities, and track real-time event progress.
 
@@ -89,3 +87,5 @@ Third-party Integrations 🔗
     📧 Email: priyanshumahlawat5@gmail.com 
     🌐 GitHub:  https://github.com/PriyanshuMahlawat/
 
+
+ Made with ❤️ by Priyanshu
