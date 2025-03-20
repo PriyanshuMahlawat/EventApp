@@ -30,13 +30,11 @@ Backend 🖥️
     
     Gunicorn - WSGI server for deployment.
     
-    SQLite / PostgreSQL - Database management.
+    SQLite - Database management.
 
 Frontend 🎨
 
     HTML, CSS, JavaScript - Basic UI components.
-    
-    Bootstrap / Tailwind CSS - Responsive styling.
 
 Storage & Cloud Services ☁️
 
