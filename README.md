@@ -12,8 +12,6 @@
   
   📍 Dynamic Room Management - Live tracking of people entering and exiting rooms.
   
-  🔔 Real-time Notifications - Get instant alerts when team members are needed.
-  
   📊 Auto-Generated Reports - Download event reports as Excel files.
   
 🌍 Live At
