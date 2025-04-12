@@ -4,35 +4,30 @@ import cloudinary
 import cloudinary.uploader
 import cloudinary.api
 
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 TEMPLATE_DIR = BASE_DIR / 'templates'
 
-# Use SQLite database
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / "db.sqlite3",  # SQLite database file
-    }
-}
-
-# Quick-start development settings - unsuitable for production
+# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "django-insecure-l1079b4vj6ulyq_2-p4%kd2abmktc6qt3&aory6^gw+unny8t(")
 
-DEBUG = True
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = False  # Set to False for production
 
 ALLOWED_HOSTS = [
     "localhost",
-    "0.0.0.0",
     "127.0.0.1",
     "amithehost.onrender.com",
-    "iamhosting.onrender.com",  # Add this!
+    "iamhosting.onrender.com",
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://iamhosting.onrender.com",
+]
 
 # Application definition
 INSTALLED_APPS = [
+    "corsheaders",  # Cors headers app
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.sites",
@@ -42,15 +37,15 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "app",
-    'cloudinary',
-    
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
+    "cloudinary",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",  # Cors middleware at the top
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -79,37 +74,15 @@ TEMPLATES = [
     },
 ]
 
-AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',
-]
+WSGI_APPLICATION = "eventapp.wsgi.application"
 
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'SCOPE': [
-            'profile',
-            'email',
-        ],
-        'AUTH_PARAMS': {
-            'access_type': 'online',
-        }
+# Database
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / "db.sqlite3",
     }
 }
-
-SITE_ID = 1
-
-
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv("SOCIAL_AUTH_GOOGLE_OAUTH2_KEY")
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv("SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET")
-
-
-
-CSRF_TRUSTED_ORIGINS = [
-    "https://iamhosting.onrender.com",
-]
-
-
-WSGI_APPLICATION = "eventapp.wsgi.application"
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -127,20 +100,35 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Internationalization
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = 'Asia/Kolkata'
-USE_TZ = True
 USE_I18N = True
+USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
-STATIC_URL = "static/"
-STATIC_ROOT = "staticfiles"
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"  # For collectstatic
 STATICFILES_DIRS = [
     BASE_DIR / "app/static",
 ]
 
+# Media files (Cloudinary)
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+cloudinary.config(
+    cloud_name='dcvxjzsdj',
+    api_key='655534359278611',
+    api_secret='azApQFPUWLdFJYlgMp4MNJ8tcvA',
+)
+
+MEDIA_URL = "https://res.cloudinary.com/dcvxjzsdj/"
+MEDIA_ROOT = BASE_DIR / "mediafiles"
+
 # Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Django AllAuth settings
+SITE_ID = 1
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 ACCOUNT_LOGOUT_REDIRECT_URL = '/'
@@ -150,17 +138,46 @@ ACCOUNT_EMAIL_VERIFICATION = "none"
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
-ACCOUNT_SIGNUP_REDIRECT_URL = '/'  # Where to redirect after signup
-ACCOUNT_AUTHENTICATION_METHOD = 'email'  # Since we're using email for Google
+ACCOUNT_SIGNUP_REDIRECT_URL = '/'
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
 
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-cloudinary.config(
-    cloud_name='dcvxjzsdj',
-    api_key='655534359278611',
-    api_secret='azApQFPUWLdFJYlgMp4MNJ8tcvA',
-)
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
 
-MEDIA_URL = "https://res.cloudinary.com/dcvxjzsdj/"
-MEDIA_ROOT = BASE_DIR / "mediafiles"  # Optional for local dev
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
+    }
+}
 
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv("SOCIAL_AUTH_GOOGLE_OAUTH2_KEY")
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv("SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET")
 
+# CORS settings
+CORS_ALLOWED_ORIGINS = [
+    "https://iamhosting.onrender.com",
+]
+
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^http://localhost:\d+$",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+# Security settings (Optional but recommended for production)
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_HSTS_SECONDS = 31536000  # One year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+SECURE_SSL_REDIRECT = True  # Force HTTPS

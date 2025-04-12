@@ -1027,7 +1027,7 @@ class FinalTableAPIView(generics.CreateAPIView):
         event_id = kwargs.get('pk')
         
         # Fetch data from API
-        endpoint = f"http://localhost:8000/api/tablemodify/{event_id}/"
+        endpoint = f"https://amithehost.onrender.com/api/tablemodify/{event_id}/"
         response = requests.get(endpoint)
         if response.status_code != 200:
             return Response({"error": "Failed to fetch data from API"}, status=500)
