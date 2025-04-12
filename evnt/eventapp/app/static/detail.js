@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", async function() {
 
     async function getid(){
         try{
-            const response = await fetch("https://amithehost.onrender.com/api/id");
+            const response = await fetch("https://iamhosting.onrender.com/api/id");
             const data = await response.json()
             id = data.event_id;
         }
@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", async function() {
     }
     await getid();
     if(id){
-        fetch(`https://amithehost.onrender.com/api/${id}/`)
+        fetch(`https://iamhosting.onrender.com/api/${id}/`)
         .then(response => response.json())
         .then(data => {
             console.log(data);

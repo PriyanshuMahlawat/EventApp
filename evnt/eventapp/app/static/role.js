@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     async function getid() {
         try {
-            const response = await fetch("https://amithehost.onrender.com/api/id/")
+            const response = await fetch("https://iamhosting.onrender.com/api/id/")
             const data = await response.json()
             
             EId = data.event_id;
@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     await getid();
 
     if (EId) {
-        fetch(`https://amithehost.onrender.com/api/memberlist/${EId}`)
+        fetch(`https://iamhosting.onrender.com/api/memberlist/${EId}`)
             .then(response => response.json())
             .then(data => {
                 addtomembers(data);
@@ -88,7 +88,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             "permission": `${name}-${rolesString}:${EId}`
         };
         console.log(postData);
-        fetch(`https://amithehost.onrender.com/api/memberlistupdate/${EId}/`, {
+        fetch(`https://iamhosting.onrender.com/api/memberlistupdate/${EId}/`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 let aTag = document.createElement("a");
                 let doneBtn = document.createElement("button");
                 doneBtn.textContent = "Done";
-                let link = "https://amithehost.onrender.com/manageEvent/";
+                let link = "https://iamhosting.onrender.com/manageEvent/";
                 aTag.href = link;
                 aTag.appendChild(doneBtn);
                 document.getElementById("for-button").appendChild(aTag);
@@ -193,7 +193,7 @@ if (!isNaN(timerStart.getTime()) && !isNaN(timerDuration)) {
     function redirectPage() {
         document.getElementById('modalOuterEndEvent').style.display = 'block';
         document.getElementById('check-report-btn').addEventListener("click", function () {
-            window.location.href = 'https://amithehost.onrender.com/completedEvents/';
+            window.location.href = 'https://iamhosting.onrender.com/completedEvents/';
         });
     }
 

@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     // Function to get the event ID
     async function getid() {
         try {
-            const response = await fetch("https://amithehost.onrender.com/api/id/");
+            const response = await fetch("https://iamhosting.onrender.com/api/id/");
             const data = await response.json();
             Event_id = data.event_id; // Store the fetched event ID
             console.log("Event ID:", Event_id);
@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     async function createmodifyTable() {
         try {
-            const response = await fetch(`https://amithehost.onrender.com/api/tableslots/${Event_id}/`);
+            const response = await fetch(`https://iamhosting.onrender.com/api/tableslots/${Event_id}/`);
             const data = await response.json();
             table = data;
 
@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 'table': table,
             };
 
-            await fetch(`https://amithehost.onrender.com/api/tablemodify/${Event_id}/`, {
+            await fetch(`https://iamhosting.onrender.com/api/tablemodify/${Event_id}/`, {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json',
@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     
     // Fetching slot data
     try {
-        const response = await fetch(`https://amithehost.onrender.com/api/tablemodify/${Event_id}/`);
+        const response = await fetch(`https://iamhosting.onrender.com/api/tablemodify/${Event_id}/`);
         const data = await response.json();
         console.log("Fetched Slot Data:", data);
         createTable(data.slot); // Pass data.slot to createTable function
@@ -179,7 +179,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     
     
     async function getmodifiedTable(){
-        const response = await fetch(`https://amithehost.onrender.com/api/tablemodify/${Event_id}/`);
+        const response = await fetch(`https://iamhosting.onrender.com/api/tablemodify/${Event_id}/`);
         const data3 = await response.json();
         const table2 = data3;
         return table2;
@@ -189,7 +189,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         let data4 = {
             'changes': Arr,
         };
-        await fetch(`https://amithehost.onrender.com/api/tablemodify/${Event_id}/`, {
+        await fetch(`https://iamhosting.onrender.com/api/tablemodify/${Event_id}/`, {
             method: "PATCH",
             headers: {
                 'Content-Type': 'application/json',
@@ -209,7 +209,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     FinaliseBtn.addEventListener("click", function (event) {
         const data = {};
         event.preventDefault();
-        fetch(`https://amithehost.onrender.com/api/finaltable/${Event_id}/`, {
+        fetch(`https://iamhosting.onrender.com/api/finaltable/${Event_id}/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -248,7 +248,7 @@ if (!isNaN(timerStart.getTime()) && !isNaN(timerDuration)) {
     function redirectPage() {
         document.getElementById('modalOuterEndEvent').style.display = 'block';
         document.getElementById('check-report-btn').addEventListener("click", function () {
-            window.location.href = 'https://amithehost.onrender.com/completedEvents/';
+            window.location.href = 'https://iamhosting.onrender.com/completedEvents/';
         });
     }
 

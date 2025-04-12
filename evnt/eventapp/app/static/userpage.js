@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var logged_in = document.getElementById("logged_in").textContent;
     let valid = true;
     console.log(email)
-    fetch("https://amithehost.onrender.com/api/eventlist/")
+    fetch("https://iamhosting.onrender.com/api/eventlist/")
         .then(response => response.json())
         .then(data => {
             if (data.members === null) {
@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", function () {
             hostnm.textContent = `By ${Arr[i].host_name}`;
 
             evtime.textContent = date;
-            var detailurl = `https://amithehost.onrender.com/api/${Arr[i].id}/`;
+            var detailurl = `https://iamhosting.onrender.com/api/${Arr[i].id}/`;
             console.log(detailurl)
             linkdetail.href = detailurl;
             detailbtn.textContent = "Detail";
@@ -106,7 +106,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         Event_id: eventid,
                     }
                     if (user_name != Arr[i].host_name) {
-                        fetch("https://amithehost.onrender.com/api/noti/", {
+                        fetch("https://iamhosting.onrender.com/api/noti/", {
                             method: "POST",
                             headers: {
                                 'Content-Type': 'application/json',
@@ -166,7 +166,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         'event_id': `${eventid}`,
                     }
                     console.log(data)
-                    fetch("https://amithehost.onrender.com/api/id/", {
+                    fetch("https://iamhosting.onrender.com/api/id/", {
                         method: "POST",
                         headers: {
                             'Content-Type': 'application/json',
@@ -182,7 +182,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         })
                         .then(data => {
                             console.log('success', data);
-                            window.location.href = "https://amithehost.onrender.com/detail/";
+                            window.location.href = "https://iamhosting.onrender.com/detail/";
                         })
                         .catch(error => {
                             console.error("Error:", error);
