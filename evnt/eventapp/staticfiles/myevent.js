@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const csrftoken = getCookie('csrftoken');
 
     
-    fetch("http://localhost:8000/api/host/")
+    fetch("https://iamhosting.onrender.com/api/host/")
     .then(response => response.json())
     .then(data => {
         console.log(data)
@@ -44,8 +44,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 let manageBtn = document.createElement("button");
 
                 paraEl.textContent = arr[i].Event_name;
-                deletehost = `http://localhost:8000/api/hostdel/${arr[i].id}/`; 
-                managelink.href = "http://localhost:8000/manageEvent/";
+                deletehost = `https://iamhosting.onrender.com/api/hostdel/${arr[i].id}/`; 
+                managelink.href = "https://iamhosting.onrender.com/manageEvent/";
                 manageBtn.textContent = "Manage";
 
                 manageBtn.addEventListener("click", function(event) {
@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     data = {
                         'event_id': `${arr[i].id}`,
                     };
-                    fetch("http://localhost:8000/api/id/", {
+                    fetch("https://iamhosting.onrender.com/api/id/", {
                         method: "POST",
                         headers: {
                             'Content-Type': 'application/json',
@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         expirationDate.setTime(expirationDate.getTime() + (24 * 60 * 60 * 1000)); 
                         document.cookie = `event_id=${arr[i].id}; expires=${expirationDate.toUTCString()}; path=/;`;
 
-                        window.location.href = "http://localhost:8000/manageEvent/";
+                        window.location.href = "https://iamhosting.onrender.com/manageEvent/";
                     })
                     .catch(error => {
                         console.error("Error:", error);
@@ -118,7 +118,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     
-    fetch("http://localhost:8000/api/joined/")
+    fetch("https://iamhosting.onrender.com/api/joined/")
     .then(response => response.json())
     .then(data => {
         console.log(data);
@@ -146,7 +146,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 let leaveEventBtn = document.createElement("button");
 
                 paraEl.textContent = arr[i].Event_name;
-                deleteevent = `http://localhost:8000/api/leaveevent/${arr[i].id}/`;
+                deleteevent = `https://iamhosting.onrender.com/api/leaveevent/${arr[i].id}/`;
 
                 leaveEventBtn.addEventListener("click", function(event) {
                     event.preventDefault();
@@ -175,7 +175,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     data = {
                         'event_id': `${arr[i].id}`,
                     };
-                    fetch("http://localhost:8000/api/id/", {
+                    fetch("https://iamhosting.onrender.com/api/id/", {
                         method: "POST",
                         headers: {
                             'Content-Type': 'application/json',
@@ -194,7 +194,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         expirationDate.setTime(expirationDate.getTime() + (60 * 60 * 1000)); 
                         document.cookie = `event_id=${arr[i].id}; expires=${expirationDate.toUTCString()}; path=/;`;
 
-                        window.location.href = "http://localhost:8000/manageEvent/";
+                        window.location.href = "https://iamhosting.onrender.com/manageEvent/";
                     })
                     .catch(error => {
                         console.error("Error:", error);

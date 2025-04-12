@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", async function() {
 
     async function getid(){
         try {
-            const response = await fetch("http://localhost:8000/api/id/");
+            const response = await fetch("https://iamhosting.onrender.com/api/id/");
             const data = await response.json();
             EventId = data.event_id;
         } catch (error) {
@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", async function() {
     await getid();
     
     if (EventId) {
-        fetch(`http://localhost:8000/api/${EventId}/`)
+        fetch(`https://iamhosting.onrender.com/api/${EventId}/`)
         .then(response => response.json())
         .then(data => {
             EventName.textContent = data.Event_name;
@@ -52,7 +52,7 @@ if (!isNaN(timerStart.getTime()) && !isNaN(timerDuration)) {
     function redirectPage() {
         document.getElementById('modalOuterEndEvent').style.display = 'block';
         document.getElementById('check-report-btn').addEventListener("click", function () {
-            window.location.href = 'http://localhost:8000/completedEvents/';
+            window.location.href = 'https://iamhosting.onrender.com/completedEvents/';
         });
     }
 

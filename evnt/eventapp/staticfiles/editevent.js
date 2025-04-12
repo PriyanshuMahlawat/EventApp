@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", function() {
     var buttons = document.querySelectorAll("ul li button");
     var id;
 
-    fetch("http://localhost:8000/api/id/")
+    fetch("https://iamhosting.onrender.com/api/id/")
     .then(response => response.json())
     .then(data => {
         id = data.event_id;
@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", function() {
     function update(data) {
         let isFormData = data instanceof FormData;
         
-        fetch(`http://localhost:8000/api/${id}/`, {
+        fetch(`https://iamhosting.onrender.com/api/${id}/`, {
             method: "PATCH",
             headers: {
                 'X-CSRFToken': csrftoken,
@@ -141,7 +141,7 @@ if (!isNaN(timerStart.getTime()) && !isNaN(timerDuration)) {
     function redirectPage() {
         document.getElementById('modalOuterEndEvent').style.display = 'block';
         document.getElementById('check-report-btn').addEventListener("click", function () {
-            window.location.href = 'http://localhost:8000/completedEvents/';
+            window.location.href = 'https://iamhosting.onrender.com/completedEvents/';
         });
     }
 

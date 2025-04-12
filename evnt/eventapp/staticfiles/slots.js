@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", async function() {
 
     async function getid() {
         try {
-            const response = await fetch("http://localhost:8000/api/id/");
+            const response = await fetch("https://iamhosting.onrender.com/api/id/");
             const data = await response.json();
             Event_id = data.event_id;
             console.log(Event_id);
@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", async function() {
     await getid();
 
     if (Event_id){
-        fetch(`http://localhost:8000/api/${Event_id}/`)
+        fetch(`https://iamhosting.onrender.com/api/${Event_id}/`)
             .then(response => response.json())
             .then(data => {
                 console.log(data)
@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", async function() {
    
     async function getEventDetails(){
         try {
-            const response = await fetch("http://localhost:8000/api/id/");
+            const response = await fetch("https://iamhosting.onrender.com/api/id/");
             const data = await response.json();
         } catch (error) {
             console.error("Error:", error);
@@ -221,7 +221,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             }
         }
 
-        fetch(`http://localhost:8000/api/slots/${Event_id}/`, {
+        fetch(`https://iamhosting.onrender.com/api/slots/${Event_id}/`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -232,7 +232,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             .then(response => response.json())
             .then(result => {
                 console.log('Success:', result);
-                window.location.href = 'http://localhost:8000/manageEvent/';
+                window.location.href = 'https://iamhosting.onrender.com/manageEvent/';
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -251,7 +251,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         function redirectPage() {
             document.getElementById('modalOuterEndEvent').style.display = 'block';
             document.getElementById('check-report-btn').addEventListener("click", function () {
-                window.location.href = 'http://localhost:8000/completedEvents/';
+                window.location.href = 'https://iamhosting.onrender.com/completedEvents/';
             });
         }
 

@@ -12,7 +12,7 @@ TEMPLATE_DIR = BASE_DIR / 'templates'
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "django-insecure-l1079b4vj6ulyq_2-p4%kd2abmktc6qt3&aory6^gw+unny8t(")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False  # Set to False for production
+DEBUG = False  # Set to False for production; use True for local testing
 
 ALLOWED_HOSTS = [
     "localhost",
@@ -21,13 +21,16 @@ ALLOWED_HOSTS = [
     "iamhosting.onrender.com",
 ]
 
+# CSRF Trusted Origins: include both production and (optionally) local origins for testing
 CSRF_TRUSTED_ORIGINS = [
     "https://iamhosting.onrender.com",
+    "http://localhost:8000",   # include if testing locally via http://localhost:8000
+    "http://127.0.0.1:8000",
 ]
 
 # Application definition
 INSTALLED_APPS = [
-    "corsheaders",  # Cors headers app
+    "corsheaders",  # Add corsheaders at the top
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.sites",
@@ -45,10 +48,10 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",  # Cors middleware at the top
+    "corsheaders.middleware.CorsMiddleware",  # Must be at the top to add CORS headers in all responses
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    "django.middleware.common.CommonMiddleware",
+    "django.middleware.common.CommonMiddleware",  # CommonMiddleware should come after CorsMiddleware
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
@@ -124,6 +127,9 @@ cloudinary.config(
 MEDIA_URL = "https://res.cloudinary.com/dcvxjzsdj/"
 MEDIA_ROOT = BASE_DIR / "mediafiles"
 
+# Use Whitenoise for static file management in production
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 # Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -161,23 +167,25 @@ SOCIALACCOUNT_PROVIDERS = {
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv("SOCIAL_AUTH_GOOGLE_OAUTH2_KEY")
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv("SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET")
 
-# CORS settings
+# CORS settings to allow cross-origin requests from the frontend
 CORS_ALLOWED_ORIGINS = [
     "https://iamhosting.onrender.com",
+    # If your frontend is served on a different domain, add it here
 ]
-
+# Alternatively, allow any localhost origin for development
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^http://localhost:\d+$",
+    r"^http://127\.0\.0\.1:\d+$",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
 
-# Security settings (Optional but recommended for production)
+# Security settings (ensure proper HTTPS usage in production)
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
-SECURE_HSTS_SECONDS = 31536000  # One year
+SECURE_HSTS_SECONDS = 31536000  # 1 year
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
-SECURE_SSL_REDIRECT = True  # Force HTTPS
+SECURE_SSL_REDIRECT = True  # Redirect all HTTP to HTTPS

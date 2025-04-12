@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     async function getFinalTable() {
         console.log("Fetching final table");
         try {
-            const response = await fetch(`http://localhost:8000/api/realTable/${username}/${event_id}/`);
+            const response = await fetch(`https://iamhosting.onrender.com/api/realTable/${username}/${event_id}/`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -56,7 +56,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     function getCurrentTable() {
-        fetch(`http://localhost:8000/api/currenttable/${event_id}`)
+        fetch(`https://iamhosting.onrender.com/api/currenttable/${event_id}`)
             .then(response => response.json())
             .then(data => {
                 DynamicDict = data.table || {};
@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     function updateCurrentTable() {
-        return fetch(`http://localhost:8000/api/currenttable/${event_id}/`, {
+        return fetch(`https://iamhosting.onrender.com/api/currenttable/${event_id}/`, {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',
@@ -135,7 +135,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     }, 5000);
 
     function fetchEventRooms() {
-        fetch(`http://localhost:8000/api/${event_id}/`)
+        fetch(`https://iamhosting.onrender.com/api/${event_id}/`)
             .then(response => response.json())
             .then(data => {
                 roomArr = data.roomArr;
@@ -260,7 +260,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 return;
             }
 
-            const response = await fetch(`http://localhost:8000/api/excelSheets/${event_id}/`, {
+            const response = await fetch(`https://iamhosting.onrender.com/api/excelSheets/${event_id}/`, {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json',
@@ -299,7 +299,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             recordRoomExit();
             const RealTable_data = prepareRealTableData();
             try {
-                const response = await fetch(`http://localhost:8000/api/realTable/${username}/${event_id}/`, {
+                const response = await fetch(`https://iamhosting.onrender.com/api/realTable/${username}/${event_id}/`, {
                     method: "POST",
                     headers: {
                         'Content-Type': 'application/json',
@@ -332,7 +332,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
 
         document.getElementById('check-report-btn').addEventListener("click", function () {
-            window.location.href = 'http://localhost:8000/completedEvents/';
+            window.location.href = 'https://iamhosting.onrender.com/completedEvents/';
         });
     }
 });
