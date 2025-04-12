@@ -23,7 +23,7 @@ if (!isNaN(timerStart.getTime()) && !isNaN(timerDuration)) {
     function redirectPage() {
         document.getElementById('modalOuterEndEvent').style.display = 'block';
         document.getElementById('check-report-btn').addEventListener("click", function () {
-            window.location.href = 'http://localhost:8000/completedEvents/';
+            window.location.href = 'https://amithehost.onrender.com/completedEvents/';
         });
     }
 

@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const csrftoken = getCookie('csrftoken');
 
     // Fetch notifications
-    fetch("http://localhost:8000/api/noti/")
+    fetch("https://amithehost.onrender.com/api/noti/")
         .then(response => response.json())
         .then(data => {
             console.log(data);
@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             
 
-            let notidellink = `http://localhost:8000/api/notidel/${id}/`;
+            let notidellink = `https://amithehost.onrender.com/api/notidel/${id}/`;
 
             paraEl.textContent = `${Arr[i].name} has requested to join your Event.`;
             paraEl2.textContent = `${realTimeago}`;
@@ -131,7 +131,7 @@ document.addEventListener("DOMContentLoaded", function () {
         data = {
             members: name,
         }
-        fetch(`http://localhost:8000/api/addmembers/${eventid}/`, {
+        fetch(`https://amithehost.onrender.com/api/addmembers/${eventid}/`, {
             method: "PATCH",
             headers: {
                 'Content-Type': 'application/json',
@@ -175,7 +175,7 @@ if (!isNaN(timerStart.getTime()) && !isNaN(timerDuration)) {
     function redirectPage() {
         document.getElementById('modalOuterEndEvent').style.display = 'block';
         document.getElementById('check-report-btn').addEventListener("click", function () {
-            window.location.href = 'http://localhost:8000/completedEvents/';
+            window.location.href = 'https://amithehost.onrender.com/completedEvents/';
         });
     }
 
