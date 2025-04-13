@@ -166,9 +166,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://iamhosting.onrender.com",
 ]
 
-CORS_ALLOWED_ORIGIN_REGEXES = [
-    r"^http://localhost:\d+$",
-]
+
 
 CORS_ALLOW_CREDENTIALS = True
 

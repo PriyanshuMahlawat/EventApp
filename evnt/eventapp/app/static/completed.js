@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const username = document.getElementById("username").textContent.trim();
     
     // API URL
-    const apiUrl = "http://localhost:8000/api/completed/get/";
+    const apiUrl = "https://iamhosting.onrender.com/api/completed/get/";
 
     // Fetch data from the API
     fetch(apiUrl, {
