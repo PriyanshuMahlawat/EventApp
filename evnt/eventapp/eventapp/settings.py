@@ -13,11 +13,10 @@ TEMPLATE_DIR = BASE_DIR / 'templates'
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "django-insecure-l1079b4vj6ulyq_2-p4%kd2abmktc6qt3&aory6^gw+unny8t(")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False  # Set to False for production
+DEBUG = True  # Set to False for production
 
 ALLOWED_HOSTS = [
-    "localhost",
-    "127.0.0.1",
+    
     "amithehost.onrender.com",
     "iamhosting.onrender.com",
 ]
