@@ -1,3 +1,4 @@
+
 from pathlib import Path
 import os
 import cloudinary
@@ -15,18 +16,19 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "django-insecure-l1079b4vj6ulyq
 DEBUG = False  # Set to False for production
 
 ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
     "amithehost.onrender.com",
     "iamhosting.onrender.com",
 ]
 
-# CSRF Trusted Origins: add your production domains
 CSRF_TRUSTED_ORIGINS = [
     "https://iamhosting.onrender.com",
 ]
 
 # Application definition
 INSTALLED_APPS = [
-    "corsheaders",  # Enables CORS for your app
+    "corsheaders",  # Cors headers app
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.sites",
@@ -44,7 +46,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",  # Must be at the top to add CORS headers
+    "corsheaders.middleware.CorsMiddleware",  # Cors middleware at the top
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -75,7 +77,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "eventapp.wsgi.application"
 
-# Database configuration (SQLite for small projects; consider Postgres for production)
+# Database
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -112,18 +114,16 @@ STATICFILES_DIRS = [
     BASE_DIR / "app/static",
 ]
 
-# Media files (Cloudinary storage)
+# Media files (Cloudinary)
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 cloudinary.config(
     cloud_name='dcvxjzsdj',
     api_key='655534359278611',
     api_secret='azApQFPUWLdFJYlgMp4MNJ8tcvA',
 )
+
 MEDIA_URL = "https://res.cloudinary.com/dcvxjzsdj/"
 MEDIA_ROOT = BASE_DIR / "mediafiles"
-
-# Use Whitenoise for static file management in production
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
@@ -149,35 +149,36 @@ AUTHENTICATION_BACKENDS = [
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
-        'SCOPE': ['profile', 'email'],
-        'AUTH_PARAMS': {'access_type': 'online'},
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
     }
 }
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv("SOCIAL_AUTH_GOOGLE_OAUTH2_KEY")
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv("SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET")
 
-# CORS settings to allow cross-origin requests from your production frontend
+# CORS settings
 CORS_ALLOWED_ORIGINS = [
     "https://iamhosting.onrender.com",
-    # Add additional production domains here if needed.
 ]
 
-# For production, you generally don't need localhost regexes.
-# Remove the development regexes (if not testing locally)
-# CORS_ALLOWED_ORIGIN_REGEXES = [
-#     r"^http://localhost:\d+$",
-#     r"^http://127\.0\.0\.1:\d+$",
-# ]
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^http://localhost:\d+$",
+]
 
 CORS_ALLOW_CREDENTIALS = True
 
-# Security settings: enforce HTTPS and set HSTS policies
+# Security settings (Optional but recommended for production)
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
-SECURE_HSTS_SECONDS = 31536000  # 1 year
+SECURE_HSTS_SECONDS = 31536000  # One year
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
-SECURE_SSL_REDIRECT = True  # Force HTTPS for every request
+SECURE_SSL_REDIRECT = True  # Force HTTPS
