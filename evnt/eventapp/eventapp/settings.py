@@ -12,25 +12,21 @@ TEMPLATE_DIR = BASE_DIR / 'templates'
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "django-insecure-l1079b4vj6ulyq_2-p4%kd2abmktc6qt3&aory6^gw+unny8t(")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False  # Set to False for production; use True for local testing
+DEBUG = False  # Set to False for production
 
 ALLOWED_HOSTS = [
-    "localhost",
-    "127.0.0.1",
     "amithehost.onrender.com",
     "iamhosting.onrender.com",
 ]
 
-# CSRF Trusted Origins: include both production and (optionally) local origins for testing
+# CSRF Trusted Origins: add your production domains
 CSRF_TRUSTED_ORIGINS = [
     "https://iamhosting.onrender.com",
-    "http://localhost:8000",   # include if testing locally via http://localhost:8000
-    "http://127.0.0.1:8000",
 ]
 
 # Application definition
 INSTALLED_APPS = [
-    "corsheaders",  # Add corsheaders at the top
+    "corsheaders",  # Enables CORS for your app
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.sites",
@@ -48,10 +44,10 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",  # Must be at the top to add CORS headers in all responses
+    "corsheaders.middleware.CorsMiddleware",  # Must be at the top to add CORS headers
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    "django.middleware.common.CommonMiddleware",  # CommonMiddleware should come after CorsMiddleware
+    "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
@@ -79,7 +75,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "eventapp.wsgi.application"
 
-# Database
+# Database configuration (SQLite for small projects; consider Postgres for production)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -116,14 +112,13 @@ STATICFILES_DIRS = [
     BASE_DIR / "app/static",
 ]
 
-# Media files (Cloudinary)
+# Media files (Cloudinary storage)
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 cloudinary.config(
     cloud_name='dcvxjzsdj',
     api_key='655534359278611',
     api_secret='azApQFPUWLdFJYlgMp4MNJ8tcvA',
 )
-
 MEDIA_URL = "https://res.cloudinary.com/dcvxjzsdj/"
 MEDIA_ROOT = BASE_DIR / "mediafiles"
 
@@ -154,33 +149,30 @@ AUTHENTICATION_BACKENDS = [
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
-        'SCOPE': [
-            'profile',
-            'email',
-        ],
-        'AUTH_PARAMS': {
-            'access_type': 'online',
-        }
+        'SCOPE': ['profile', 'email'],
+        'AUTH_PARAMS': {'access_type': 'online'},
     }
 }
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv("SOCIAL_AUTH_GOOGLE_OAUTH2_KEY")
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv("SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET")
 
-# CORS settings to allow cross-origin requests from the frontend
+# CORS settings to allow cross-origin requests from your production frontend
 CORS_ALLOWED_ORIGINS = [
     "https://iamhosting.onrender.com",
-    # If your frontend is served on a different domain, add it here
+    # Add additional production domains here if needed.
 ]
-# Alternatively, allow any localhost origin for development
-CORS_ALLOWED_ORIGIN_REGEXES = [
-    r"^http://localhost:\d+$",
-    r"^http://127\.0\.0\.1:\d+$",
-]
+
+# For production, you generally don't need localhost regexes.
+# Remove the development regexes (if not testing locally)
+# CORS_ALLOWED_ORIGIN_REGEXES = [
+#     r"^http://localhost:\d+$",
+#     r"^http://127\.0\.0\.1:\d+$",
+# ]
 
 CORS_ALLOW_CREDENTIALS = True
 
-# Security settings (ensure proper HTTPS usage in production)
+# Security settings: enforce HTTPS and set HSTS policies
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SESSION_COOKIE_SECURE = True
@@ -188,4 +180,4 @@ CSRF_COOKIE_SECURE = True
 SECURE_HSTS_SECONDS = 31536000  # 1 year
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
-SECURE_SSL_REDIRECT = True  # Redirect all HTTP to HTTPS
+SECURE_SSL_REDIRECT = True  # Force HTTPS for every request
