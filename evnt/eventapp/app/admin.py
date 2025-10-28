@@ -9,7 +9,7 @@ admin.site.register(CurrentEvent)
 admin.site.register(completedEvents)
 admin.site.register(RealTable)
 admin.site.register(FinalSlotsTable)
-admin.site.register(tablemodifications)
+admin.site.register(tablemodifications) 
 
 
 
